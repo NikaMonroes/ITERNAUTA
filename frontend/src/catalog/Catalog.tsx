@@ -195,8 +195,7 @@ function Catalog() {
         <h1>Explora el catálogo</h1>
 
         <p>
-          Encuentra mangas, cómics y novelas
-          gráficas entre miles de historias.
+          Encuentra mangas, cómics entre miles de historias.
         </p>
       </section>
 
