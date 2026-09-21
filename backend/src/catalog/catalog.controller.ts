@@ -23,6 +23,7 @@ export class CatalogController {
     private readonly catalogService: CatalogService,
   ) {}
 
+  @Get('test-jumpseller-sku')
   @ApiOperation({
     summary: 'Probar búsqueda de producto por SKU en Jumpseller',
     description:
@@ -30,15 +31,16 @@ export class CatalogController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Respuesta obtenida desde Jumpseller.',
+    description:
+      'Respuesta obtenida correctamente desde Jumpseller.',
   })
-  @Get('test-jumpseller-sku')
-  testJumpsellerSku() {
+  async testJumpsellerSku() {
     const sku = '9786075783734'
 
     return this.catalogService.searchProductBySKU(sku)
   }
 
+  @Get('categories')
   @ApiOperation({
     summary: 'Obtener categorías',
     description:
@@ -48,29 +50,29 @@ export class CatalogController {
     status: 200,
     description: 'Lista de categorías.',
   })
-  @Get('categories')
-  getCategories() {
+  async getCategories() {
     return this.catalogService.getCategories()
   }
 
+  @Get('series')
   @ApiOperation({
     summary: 'Obtener series',
     description:
-      'Obtiene las series registradas en el catálogo.',
+      'Obtiene las series registradas en el catálogo de ITERNAUTA.',
   })
   @ApiResponse({
     status: 200,
     description: 'Lista de series.',
   })
-  @Get('series')
-  getSeries() {
+  async getSeries() {
     return this.catalogService.getSeries()
   }
 
+  @Get('publications')
   @ApiOperation({
     summary: 'Consultar publicaciones',
     description:
-      'Obtiene publicaciones del catálogo utilizando búsqueda, filtros y paginación.',
+      'Obtiene publicaciones del catálogo utilizando búsqueda, filtros por categoría y editorial, y paginación.',
   })
   @ApiQuery({
     name: 'search',
@@ -105,15 +107,15 @@ export class CatalogController {
     required: false,
     type: Number,
     description:
-      'Cantidad máxima de publicaciones por página. Máximo permitido: 100.',
+      'Cantidad de publicaciones por página. El máximo permitido es 100.',
     example: 20,
   })
   @ApiResponse({
     status: 200,
-    description: 'Lista paginada de publicaciones.',
+    description:
+      'Lista paginada de publicaciones.',
   })
-  @Get('publications')
-  getPublications(
+  async getPublications(
     @Query('search') search?: string,
     @Query('category') category?: string,
     @Query('publisher') publisher?: string,
@@ -129,6 +131,7 @@ export class CatalogController {
     )
   }
 
+  @Get('publications/:publicationId')
   @ApiOperation({
     summary: 'Obtener detalle de una publicación',
     description:
@@ -147,12 +150,14 @@ export class CatalogController {
   })
   @ApiResponse({
     status: 404,
-    description: 'La publicación solicitada no existe.',
+    description:
+      'La publicación solicitada no existe.',
   })
-  @Get('publications/:publicationId')
-  getPublicationDetail(
+  async getPublicationDetail(
     @Param('publicationId', ParseIntPipe) publicationId: number,
   ) {
-    return this.catalogService.getPublicationDetail(publicationId)
+    return this.catalogService.getPublicationDetail(
+      publicationId,
+    )
   }
 }
