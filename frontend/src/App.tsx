@@ -3,6 +3,7 @@ import Register from './auth/Register'
 import ForgotPassword from './auth/ForgotPassword'
 import UpdatePassword from './auth/UpdatePassword'
 import Catalog from './catalog/Catalog'
+import PublicationDetail from './catalog/PublicationDetail'
 
 
 function App() {
@@ -19,6 +20,17 @@ function App() {
   if (path === '/update-password') {
     return <UpdatePassword />
   }
+  if (path.startsWith('/catalog/publications/')) {
+  const publicationId = Number(
+    path.split('/').pop(),
+  )
+
+  return (
+    <PublicationDetail
+      publicationId={publicationId}
+    />
+  )
+}
 
   if (path === '/catalog') {
     return <Catalog />
