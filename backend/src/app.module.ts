@@ -1,9 +1,17 @@
-import { Module } from '@nestjs/common';
-import { CatalogModule } from './catalog/catalog.module.js';
-import { DatabaseModule } from './database/database.module.js';
-import { OffersModule } from './offers/offers.module.js';
+import { Module } from '@nestjs/common'
+import { CatalogModule } from './catalog/catalog.module.js'
+import { DatabaseModule } from './database/database.module.js'
+import { OffersModule } from './offers/offers.module.js'
+import { UsersModule } from './users/users.module.js'
+import { AuthModule } from './auth/auth.module.js'
 
 @Module({
-  imports: [DatabaseModule, CatalogModule, OffersModule],
+  imports: [
+    DatabaseModule,
+    CatalogModule,
+    OffersModule,
+    UsersModule,
+    AuthModule,
+  ],
 })
 export class AppModule {}

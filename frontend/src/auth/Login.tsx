@@ -27,6 +27,7 @@ function Login() {
 
     console.log('Usuario autenticado:', data.user)
     console.log('Sesión:', data.session)
+    console.log('ACCESS TOKEN:', data.session?.access_token)
 
     setMensaje('Inicio de sesión exitoso.')
   }
