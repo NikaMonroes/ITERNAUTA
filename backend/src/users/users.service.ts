@@ -25,6 +25,13 @@ export class UsersService {
     identityProviderId: string,
     email: string,
   ) {
+    const existingUser =
+      await this.findByIdentityProviderId(identityProviderId)
+
+    if (existingUser) {
+      return existingUser
+    }
+
     const result = await this.db
       .insert(users)
       .values({

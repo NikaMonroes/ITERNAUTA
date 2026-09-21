@@ -4,7 +4,7 @@ import {
   Param,
   ParseIntPipe,
   Query,
-} from '@nestjs/common';
+} from '@nestjs/common'
 
 import {
   ApiOperation,
@@ -12,9 +12,9 @@ import {
   ApiQuery,
   ApiResponse,
   ApiTags,
-} from '@nestjs/swagger';
+} from '@nestjs/swagger'
 
-import { CatalogService } from './catalog.service.js';
+import { CatalogService } from './catalog.service.js'
 
 @ApiTags('Catalog')
 @Controller('catalog')
@@ -26,30 +26,17 @@ export class CatalogController {
   @ApiOperation({
     summary: 'Probar búsqueda de producto por SKU en Jumpseller',
     description:
-      'Consulta el catálogo externo de Jumpseller utilizando un SKU de prueba.',
+      'Ejecuta una consulta de prueba contra la API de Jumpseller utilizando un SKU predefinido.',
   })
   @ApiResponse({
     status: 200,
-    description:
-      'Producto encontrado o respuesta recibida desde Jumpseller.',
+    description: 'Respuesta obtenida desde Jumpseller.',
   })
-  //=======================
-  // Test method to search for a product by SKU
-@ApiOperation({
-  summary: 'Probar búsqueda de producto por SKU en Jumpseller',
-  description:
-    'Ejecuta una consulta de prueba contra la API de Jumpseller utilizando un SKU predefinido.',
-})
-@ApiResponse({
-  status: 200,
-  description: 'Respuesta obtenida desde Jumpseller.',
-})
-  //=====================
   @Get('test-jumpseller-sku')
   testJumpsellerSku() {
-    const sku = '9786075783734';
+    const sku = '9786075783734'
 
-    return this.catalogService.searchProductBySKU(sku);
+    return this.catalogService.searchProductBySKU(sku)
   }
 
   @ApiOperation({
@@ -63,7 +50,7 @@ export class CatalogController {
   })
   @Get('categories')
   getCategories() {
-    return this.catalogService.getCategories();
+    return this.catalogService.getCategories()
   }
 
   @ApiOperation({
@@ -77,7 +64,7 @@ export class CatalogController {
   })
   @Get('series')
   getSeries() {
-    return this.catalogService.getSeries();
+    return this.catalogService.getSeries()
   }
 
   @ApiOperation({
@@ -139,7 +126,7 @@ export class CatalogController {
       publisher,
       Number(page),
       Number(limit),
-    );
+    )
   }
 
   @ApiOperation({
@@ -166,6 +153,6 @@ export class CatalogController {
   getPublicationDetail(
     @Param('publicationId', ParseIntPipe) publicationId: number,
   ) {
-    return this.catalogService.getPublicationDetail(publicationId);
+    return this.catalogService.getPublicationDetail(publicationId)
   }
 }
