@@ -10,7 +10,11 @@ function Header({
   return (
     <header className="site-header">
       <div className="header-inner">
-        <a href="/catalog" className="brand">
+
+        <a
+          href="/catalog"
+          className="brand"
+        >
           ITERNAUTA
         </a>
 
@@ -25,12 +29,8 @@ function Header({
             Catálogo
           </a>
 
-          <a href="/categories">
-            Categorías
-          </a>
-
-          <a href="/series">
-            Series
+          <a href="/about">
+            Acerca de
           </a>
         </nav>
 
@@ -52,13 +52,14 @@ function Header({
             </a>
           ) : (
             <a
-              href="/"
+              href="/login"
               className="login-link"
             >
               Ingresar
             </a>
           )}
         </div>
+
       </div>
     </header>
   )

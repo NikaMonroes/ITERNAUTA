@@ -2,6 +2,7 @@ import Login from './auth/Login'
 import Register from './auth/Register'
 import ForgotPassword from './auth/ForgotPassword'
 import UpdatePassword from './auth/UpdatePassword'
+import Account from './auth/Account'
 
 import Catalog from './catalog/Catalog'
 import PublicationDetail from './catalog/PublicationDetail'
@@ -9,20 +10,44 @@ import PublicationDetail from './catalog/PublicationDetail'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 
-function App() {
+import {
+  AuthProvider,
+  useAuth,
+} from './auth/AuthContext'
+
+function AppContent() {
   const path = window.location.pathname
 
-  const isAuthenticated = false
+  const {
+    user,
+    loading,
+  } = useAuth()
+
+  if (loading) {
+    return null
+  }
+
+  const isAuthenticated = Boolean(user)
 
   let content
 
-  if (path === '/register') {
+  if (path === '/login') {
+    content = <Login />
+
+  } else if (path === '/register') {
     content = <Register />
+
   } else if (path === '/forgot-password') {
     content = <ForgotPassword />
+
   } else if (path === '/update-password') {
     content = <UpdatePassword />
-  } else if (path.startsWith('/catalog/publications/')) {
+
+  } else if (path === '/account') {
+  content = <Account />
+  } else if (
+    path.startsWith('/catalog/publications/')
+  ) {
     const publicationId = Number(
       path.split('/').pop(),
     )
@@ -32,15 +57,22 @@ function App() {
         publicationId={publicationId}
       />
     )
-  } else if (path === '/catalog') {
+
+  } else if (
+    path === '/' ||
+    path === '/catalog'
+  ) {
     content = <Catalog />
+
   } else {
-    content = <Login />
+    content = <Catalog />
   }
 
   return (
     <div className="app-shell">
-      <Header isAuthenticated={isAuthenticated} />
+      <Header
+        isAuthenticated={isAuthenticated}
+      />
 
       <main className="app-main">
         {content}
@@ -48,6 +80,14 @@ function App() {
 
       <Footer />
     </div>
+  )
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   )
 }
 

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
+import './Login.css'
 
 function Login() {
   const [email, setEmail] = useState('')
@@ -7,16 +8,19 @@ function Login() {
   const [mensaje, setMensaje] = useState('')
   const [cargando, setCargando] = useState(false)
 
-  async function iniciarSesion(e: React.FormEvent) {
+  async function iniciarSesion(
+    e: React.FormEvent,
+  ) {
     e.preventDefault()
 
     setMensaje('')
     setCargando(true)
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    const { data, error } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
     setCargando(false)
 
@@ -25,105 +29,109 @@ function Login() {
       return
     }
 
-    console.log('Usuario autenticado:', data.user)
-    console.log('Sesión:', data.session)
-    console.log('ACCESS TOKEN:', data.session?.access_token)
+    console.log(
+      'Usuario autenticado:',
+      data.user,
+    )
 
-    setMensaje('Inicio de sesión exitoso.')
+    setMensaje(
+      'Inicio de sesión exitoso.',
+    )
+
+    window.location.href = '/catalog'
   }
-
-
-  // Logout
-  async function cerrarSesion() {
-  setMensaje('')
-  setCargando(true)
-
-  const { error } = await supabase.auth.signOut()
-
-  setCargando(false)
-
-  if (error) {
-    setMensaje(`Error: ${error.message}`)
-    return
-  }
-
-  setMensaje('Sesión cerrada correctamente.')
-}
 
   return (
-    <div>
-      <h1>ITERNAUTA</h1>
-      <h2>Iniciar sesión</h2>
+    <section className="login-page">
+      <div className="login-card">
 
-      <form onSubmit={iniciarSesion}>
-        <div>
-          <label htmlFor="email">Correo electrónico</label>
-          <br />
-          <input
-            id="email"
-            type="email"
-            placeholder="correo@ejemplo.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+        <div className="login-header">
+          <div className="login-orbit">
+            ✦
+          </div>
+
+          <h1>ITERNAUTA</h1>
+
+          <p>
+            Explora historias.
+            <br />
+            Encuentra tu mundo.
+          </p>
         </div>
 
-        <br />
-
-        <div>
-          <label htmlFor="password">Contraseña</label>
-          <br />
-          <input
-            id="password"
-            type="password"
-            placeholder="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-
-        <br />
-
-        <button type="submit" disabled={cargando}>
-          {cargando ? 'Iniciando sesión...' : 'Iniciar sesión'}
-        </button>
-      </form>
-
-      <br />
-
-      <button
-        type="button"
-        onClick={() => {
-          window.location.href = '/forgot-password'
-        }}
-      >
-        Olvidé mi contraseña
-      </button>
-
-      <br />
-      <br />
-
-      <button
-        type="button"
-        onClick={() => {
-          window.location.href = '/register'
-        }}
-      >
-        Crear una cuenta
-      </button>
-
-      <p>{mensaje}</p>
-
-      <button
-        type="button"
-        onClick={cerrarSesion}
-        disabled={cargando}
+        <form
+          className="login-form"
+          onSubmit={iniciarSesion}
         >
-        Cerrar sesión
-      </button>
-    </div>
+          <div className="login-field">
+            <label htmlFor="email">
+              Correo electrónico
+            </label>
+
+            <input
+              id="email"
+              type="email"
+              placeholder="correo@ejemplo.com"
+              value={email}
+              onChange={(e) =>
+                setEmail(e.target.value)
+              }
+              required
+            />
+          </div>
+
+          <div className="login-field">
+            <div className="login-label-row">
+              <label htmlFor="password">
+                Contraseña
+              </label>
+
+              <a href="/forgot-password">
+                ¿La olvidaste?
+              </a>
+            </div>
+
+            <input
+              id="password"
+              type="password"
+              placeholder="Tu contraseña"
+              value={password}
+              onChange={(e) =>
+                setPassword(e.target.value)
+              }
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="login-submit"
+            disabled={cargando}
+          >
+            {cargando
+              ? 'Ingresando...'
+              : 'Ingresar'}
+          </button>
+        </form>
+
+        {mensaje && (
+          <p className="login-message">
+            {mensaje}
+          </p>
+        )}
+
+        <div className="login-register">
+          <span>
+            ¿Todavía no tienes cuenta?
+          </span>
+
+          <a href="/register">
+            Crear una cuenta
+          </a>
+        </div>
+
+      </div>
+    </section>
   )
 }
 

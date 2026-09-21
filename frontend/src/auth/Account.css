@@ -1,0 +1,189 @@
+.account-page {
+  width: 100%;
+  padding: 4rem 1.5rem 5rem;
+}
+
+.account-container {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.account-header {
+  margin-bottom: 2rem;
+}
+
+.account-kicker,
+.account-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.account-kicker {
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.account-header h1 {
+  margin: 0 0 0.75rem;
+  color: var(--text-h);
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1.1;
+}
+
+.account-header p {
+  max-width: 650px;
+  margin: 0;
+  line-height: 1.7;
+}
+
+.account-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+}
+
+.account-profile {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 2rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.account-label {
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+
+.account-email {
+  display: block;
+  color: var(--text-h);
+  font-size: 1rem;
+  word-break: break-word;
+}
+
+.account-plan {
+  padding-left: 2rem;
+  border-left: 1px solid var(--border);
+}
+
+.account-plan span {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.account-plan strong {
+  color: var(--accent);
+}
+
+.account-logout {
+  border: 1px solid #d9c8c8;
+  background: transparent;
+  color: #e69efa;
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.account-logout:hover {
+  background: #382641;
+}
+
+.account-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.account-option {
+  display: flex;
+  gap: 1.25rem;
+  padding: 1.75rem;
+  background: rgba(28, 10, 33, 0.75);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.account-option:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+  border-color: rgba(123, 63, 228, 0.3);
+}
+
+.account-option-icon {
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.account-option-content {
+  min-width: 0;
+}
+
+.account-option-content h2 {
+  margin: 0.35rem 0 0.65rem;
+  color: var(--text-h);
+  font-size: 1.25rem;
+}
+
+.account-option-content p {
+  margin: 0 0 1rem;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.account-option-link {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.account-option-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .account-page {
+    padding: 2.5rem 1rem 4rem;
+  }
+
+  .account-profile {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .account-plan {
+    padding-left: 0;
+    padding-top: 1rem;
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
+
+  .account-logout {
+    width: 100%;
+  }
+
+  .account-options {
+    grid-template-columns: 1fr;
+  }
+}
