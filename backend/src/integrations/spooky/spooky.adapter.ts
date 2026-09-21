@@ -31,77 +31,104 @@ export interface NormalizedSpookyProduct {
 }
 
 export class SpookyAdapter {
+  /**
+   * Elimina únicamente el prefijo PREVENTA del título.
+   *
+   * Ejemplo:
+   * PREVENTA Naruto 15
+   * → Naruto 15
+   */
+  private normalizeTitle(title: string): string {
+  return title
+    .replace(/^PREVENTA\s*[-_]\s*/i, '')
+    .replace(/^PREVENTA\s+/i, '')
+    .trim()
+}
 
-// Normalizar titulo serie
+  /**
+   * Extrae el nombre de la serie y el volumen desde el título.
+   */
+  private extractSeriesData(title: string): {
+    seriesTitle: string;
+    volume: number | null;
+    publicationType: PublicationType;
+  } {
+    const match = title.match(/^(.*?)\s+Vol\.?\s+(\d+)/i);
 
-private extractSeriesData(title: string): {
-  seriesTitle: string;
-  volume: number | null;
-  publicationType: PublicationType;
-} {
-  const match = title.match(/^(.*?)\s+Vol\.?\s+(\d+)/i);
+    if (!match) {
+      return {
+        seriesTitle: title.trim(),
+        volume: null,
+        publicationType: 'TOMO_UNICO',
+      };
+    }
 
-  if (!match) {
     return {
-      seriesTitle: title.trim(),
-      volume: null,
-      publicationType: 'TOMO_UNICO',
+      seriesTitle: match[1].trim(),
+      volume: Number(match[2]),
+      publicationType: 'SERIE',
     };
   }
 
-  return {
-    seriesTitle: match[1].trim(),
-    volume: Number(match[2]),
-    publicationType: 'SERIE',
-  };
-}
-// Test method to extract series data from a title
-public testExtractSeries(title: string) {
-  return this.extractSeriesData(title);
-}
-
-normalize(product: JumpsellerProduct): NormalizedSpookyProduct {
-  const seriesData = this.extractSeriesData(product.name);
-
-  const category = product.categories.find((category) =>
-    ['Manga', 'Cómic'].includes(category.name),
-  );
-
-  if (!category) {
-    throw new Error(
-      `El producto "${product.name}" no pertenece a Manga ni Cómic.`,
-    );
+  /**
+   * Método de prueba para verificar la extracción de serie y volumen.
+   */
+  public testExtractSeries(title: string) {
+    return this.extractSeriesData(title);
   }
 
-  return {
-    publication: {
-      title: product.name,
-      seriesTitle: seriesData.seriesTitle,
-      category: category.name as IternautaCategory,
-      publicationType: seriesData.publicationType,
-      volume: seriesData.volume,
-      publisher: product.brand,
-      isbn: product.sku,
-      coverUrl: product.images[0]?.url ?? null,
-      description: product.description,
-    },
-
-    offer: {
-      partnerSku: product.sku,
-      price: product.price,
-      stock: product.stock,
-      status: product.status,
-    },
-
-    source: {
-      productId: product.id,
-      categories: product.categories.map((category) => category.name),
-    },
-  };
-}
-/**
   normalize(product: JumpsellerProduct): NormalizedSpookyProduct {
-    throw new Error('Not implemented');
-  } */
-}
+    /**
+     * Primero normalizamos el título.
+     *
+     * La categorización NO cambia.
+     */
+    const normalizedTitle = this.normalizeTitle(product.name);
 
+    const seriesData =
+      this.extractSeriesData(normalizedTitle);
+
+    const category = product.categories.find((category) =>
+      ['Manga', 'Cómic'].includes(category.name),
+    );
+
+    if (!category) {
+      throw new Error(
+        `El producto "${product.name}" no pertenece a Manga ni Cómic.`,
+      );
+    }
+
+    return {
+      publication: {
+        title: normalizedTitle,
+        seriesTitle: seriesData.seriesTitle,
+        category: category.name as IternautaCategory,
+        publicationType: seriesData.publicationType,
+        volume: seriesData.volume,
+
+        publisher: product.brand,
+
+        // Regla de dominio ITERNAUTA:
+        // SKU de Spooky House = ISBN de ITERNAUTA.
+        isbn: product.sku,
+
+        coverUrl: product.images[0]?.url ?? null,
+        description: product.description,
+      },
+
+      offer: {
+        partnerSku: product.sku,
+        price: product.price,
+        stock: product.stock,
+        status: product.status,
+      },
+
+      source: {
+        productId: product.id,
+        categories: product.categories.map(
+          (category) => category.name,
+        ),
+      },
+    };
+  }
+}
