@@ -1,0 +1,94 @@
+.site-header {
+  width: 100%;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-inner {
+  width: 100%;
+  max-width: 1280px;
+  min-height: 72px;
+  margin: 0 auto;
+  padding: 0 32px;
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.brand {
+  color: var(--text-h);
+  text-decoration: none;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+}
+
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex: 1;
+}
+
+.main-nav a,
+.login-link,
+.account-link {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.main-nav a:hover,
+.login-link:hover,
+.account-link:hover {
+  color: var(--accent);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.search-button {
+  border: 0;
+  background: transparent;
+  padding: 6px;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.search-button:hover {
+  transform: scale(1.05);
+}
+
+.login-link,
+.account-link {
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+@media (max-width: 760px) {
+  .header-inner {
+    min-height: 64px;
+    padding: 0 18px;
+    gap: 16px;
+  }
+
+  .main-nav {
+    display: none;
+  }
+
+  .header-actions {
+    margin-left: auto;
+  }
+}

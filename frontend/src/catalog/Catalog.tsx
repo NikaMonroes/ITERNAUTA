@@ -1,5 +1,14 @@
 import { useEffect, useState } from 'react'
 import { apiGet } from '../lib/api'
+import './Catalog.css'
+
+interface Offer {
+  partner: string
+  partnerSku: string
+  price: number
+  stock: number
+  status: string
+}
 
 interface Publication {
   id: number
@@ -10,6 +19,7 @@ interface Publication {
   isbn: string | null
   coverUrl: string | null
   description: string | null
+  offers: Offer[]
 }
 
 interface PublicationsResponse {
@@ -25,6 +35,14 @@ interface PublicationsResponse {
 interface Category {
   id: number
   name: string
+}
+
+function formatPrice(price: number) {
+  return new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    maximumFractionDigits: 0,
+  }).format(price)
 }
 
 function Catalog() {
@@ -47,17 +65,6 @@ function Catalog() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const publishers = Array.from(
-    new Set(
-      publications
-        .map((publication) => publication.publisher)
-        .filter(
-          (publisher): publisher is string =>
-            Boolean(publisher),
-        ),
-    ),
-  )
-
   useEffect(() => {
     async function loadCategories() {
       try {
@@ -67,7 +74,10 @@ function Catalog() {
 
         setCategories(response)
       } catch (err) {
-        console.error('Error cargando categorías:', err)
+        console.error(
+          'Error cargando categorías:',
+          err,
+        )
       }
     }
 
@@ -116,7 +126,28 @@ function Catalog() {
     }
 
     loadCatalog()
-  }, [search, category, publisher, page])
+  }, [
+    search,
+    category,
+    publisher,
+    page,
+  ])
+
+  const publishers = Array.from(
+    new Set(
+      publications
+        .map(
+          (publication) =>
+            publication.publisher,
+        )
+        .filter(
+          (
+            publisher,
+          ): publisher is string =>
+            Boolean(publisher),
+        ),
+    ),
+  )
 
   function handleSearchChange(
     event: React.ChangeEvent<HTMLInputElement>,
@@ -155,31 +186,46 @@ function Catalog() {
   }
 
   return (
-    <div className="container py-4">
-      <h1>Catálogo ITERNAUTA</h1>
+    <main className="catalog-page">
+      <section className="catalog-hero">
+        <span className="catalog-kicker">
+          ✦ BIBLIOTECA ITERNAUTA
+        </span>
 
-      <div className="row g-3 mb-4">
-        <div className="col-md-6">
-          <label className="form-label">
+        <h1>Explora el catálogo</h1>
+
+        <p>
+          Encuentra mangas, cómics y novelas
+          gráficas entre miles de historias.
+        </p>
+      </section>
+
+      <section className="catalog-filters">
+        <div className="catalog-search">
+          <label htmlFor="catalog-search">
             Buscar
           </label>
 
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Buscar por título..."
-            value={search}
-            onChange={handleSearchChange}
-          />
+          <div className="search-field">
+            <span>🔍</span>
+
+            <input
+              id="catalog-search"
+              type="text"
+              placeholder="Buscar por título..."
+              value={search}
+              onChange={handleSearchChange}
+            />
+          </div>
         </div>
 
-        <div className="col-md-3">
-          <label className="form-label">
+        <div>
+          <label htmlFor="catalog-category">
             Categoría
           </label>
 
           <select
-            className="form-select"
+            id="catalog-category"
             value={category}
             onChange={handleCategoryChange}
           >
@@ -198,13 +244,13 @@ function Catalog() {
           </select>
         </div>
 
-        <div className="col-md-3">
-          <label className="form-label">
+        <div>
+          <label htmlFor="catalog-publisher">
             Editorial
           </label>
 
           <select
-            className="form-select"
+            id="catalog-publisher"
             value={publisher}
             onChange={handlePublisherChange}
           >
@@ -222,23 +268,59 @@ function Catalog() {
             ))}
           </select>
         </div>
+      </section>
+
+      <div className="catalog-summary">
+        <span>
+          {pagination.total.toLocaleString('es-CO')}{' '}
+          publicaciones
+        </span>
+
+        {!loading &&
+          pagination.totalPages > 0 && (
+            <span>
+              Página {pagination.page} de{' '}
+              {pagination.totalPages}
+            </span>
+          )}
       </div>
 
       {loading && (
-        <p>Cargando catálogo...</p>
+        <div className="catalog-state">
+          <span className="catalog-loader">
+            ✦
+          </span>
+
+          <p>
+            Explorando la biblioteca...
+          </p>
+        </div>
       )}
 
       {error && (
-        <div className="alert alert-danger">
-          Error: {error}
+        <div className="catalog-error">
+          <strong>
+            No pudimos cargar el catálogo.
+          </strong>
+
+          <span>{error}</span>
         </div>
       )}
 
       {!loading &&
         !error &&
         publications.length === 0 && (
-          <div className="alert alert-info">
-            No se encontraron publicaciones.
+          <div className="catalog-state">
+            <span>🌌</span>
+
+            <h2>
+              No encontramos publicaciones
+            </h2>
+
+            <p>
+              Prueba con otra búsqueda o cambia
+              los filtros.
+            </p>
           </div>
         )}
 
@@ -246,86 +328,161 @@ function Catalog() {
         !error &&
         publications.length > 0 && (
           <>
-            <div className="row g-4">
-              {publications.map((publication) => (
-                <div
-                  className="col-md-6 col-lg-4"
-                  key={publication.id}
-                >
-                  <article className="card h-100">
-                    {publication.coverUrl && (
-                      <img
-                        src={publication.coverUrl}
-                        className="card-img-top"
-                        alt={publication.title}
-                        style={{
-                          height: '350px',
-                          objectFit: 'contain',
-                        }}
-                      />
-                    )}
+            <section className="catalog-grid">
+              {publications.map(
+                (publication) => {
+                  const availableOffers =
+                    publication.offers.filter(
+                      (offer) =>
+                        offer.status ===
+                          'available' &&
+                        offer.stock > 0,
+                    )
 
-                    <div className="card-body">
-                      <h2 className="h5">
+                  return (
+                    <article
+                      className="publication-card"
+                      key={publication.id}
+                    >
+                      <a
+                        href={`/catalog/publications/${publication.id}`}
+                        className="publication-cover"
+                      >
+                        {publication.coverUrl ? (
+                          <img
+                            src={
+                              publication.coverUrl
+                            }
+                            alt={
+                              publication.title
+                            }
+                          />
+                        ) : (
+                          <div className="cover-placeholder">
+                            <span>✦</span>
+                            <small>
+                              Sin portada
+                            </small>
+                          </div>
+                        )}
+                      </a>
+
+                      <div className="publication-body">
                         <a
                           href={`/catalog/publications/${publication.id}`}
-                          className="text-decoration-none"
+                          className="publication-title"
                         >
                           {publication.title}
                         </a>
-                      </h2>
 
-                      <p className="mb-1">
-                        <strong>Volumen:</strong>{' '}
-                        {publication.volume ?? 'N/A'}
-                      </p>
+                        <div className="publication-meta">
+                          {publication.volume !==
+                            null && (
+                            <span>
+                              Vol.{' '}
+                              {
+                                publication.volume
+                              }
+                            </span>
+                          )}
 
-                      <p className="mb-1">
-                        <strong>Editorial:</strong>{' '}
-                        {publication.publisher ?? 'N/A'}
-                      </p>
+                          {publication.publisher && (
+                            <span>
+                              {
+                                publication.publisher
+                              }
+                            </span>
+                          )}
+                        </div>
 
-                      <p className="mb-1">
-                        <strong>ISBN:</strong>{' '}
-                        {publication.isbn ?? 'N/A'}
-                      </p>
+                        {publication.isbn && (
+                          <div className="publication-isbn">
+                            ISBN{' '}
+                            {publication.isbn}
+                          </div>
+                        )}
 
-                      <p className="text-muted">
-                        {publication.description}
-                      </p>
-                    </div>
-                  </article>
-                </div>
-              ))}
-            </div>
+                        <div className="publication-offers">
+                          {availableOffers.length >
+                          0 ? (
+                            <>
+                              <div className="offers-heading">
+                                ⭐{' '}
+                                {availableOffers.length ===
+                                1
+                                  ? 'Disponible con'
+                                  : `${availableOffers.length} partners`}
+                              </div>
 
-            <div className="d-flex justify-content-center align-items-center gap-3 mt-4">
+                              {availableOffers.map(
+                                (
+                                  offer,
+                                  index,
+                                ) => (
+                                  <div
+                                    className="offer-row"
+                                    key={`${offer.partner}-${index}`}
+                                  >
+                                    <span>
+                                      ⭐{' '}
+                                      {
+                                        offer.partner
+                                      }
+                                    </span>
+
+                                    <strong>
+                                      {formatPrice(
+                                        offer.price,
+                                      )}
+                                    </strong>
+                                  </div>
+                                ),
+                              )}
+                            </>
+                          ) : (
+                            <div className="no-offers">
+                              ○ Sin ofertas disponibles
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </article>
+                  )
+                },
+              )}
+            </section>
+
+            <nav
+              className="catalog-pagination"
+              aria-label="Paginación del catálogo"
+            >
               <button
-                className="btn btn-outline-primary"
+                type="button"
                 onClick={previousPage}
                 disabled={page <= 1}
               >
-                Anterior
+                ← Anterior
               </button>
 
               <span>
-                Página {pagination.page} de{' '}
+                {pagination.page} /{' '}
                 {pagination.totalPages}
               </span>
 
               <button
-                className="btn btn-outline-primary"
+                type="button"
                 onClick={nextPage}
                 disabled={
-                  page >= pagination.totalPages
+                  page >=
+                  pagination.totalPages
                 }
               >
-                Siguiente
+                Siguiente →
               </button>
-            </div>
+            </nav>
           </>
         )}
-    </div>
+    </main>
   )
 }
 

@@ -1,11 +1,16 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
-import { DATABASE_CONNECTION } from '../database/database.provider.js';
-import type { Database } from '../database/database.provider.js';
-
-
-
-//import { categories, series } from '../database/schema/index.js';
+import {
+  eq,
+  ilike,
+  count,
+  and,
+  inArray,
+} from 'drizzle-orm';
 
 import {
   categories,
@@ -16,9 +21,17 @@ import {
   partners,
 } from '../database/schema/index.js';
 
-import { JumpsellerClient } from '../integrations/jumpseller/jumpseller.client.js';
+import {
+  DATABASE_CONNECTION,
+} from '../database/database.provider.js';
 
-import { eq, ilike, count, and } from 'drizzle-orm';
+import type {
+  Database,
+} from '../database/database.provider.js';
+
+import {
+  JumpsellerClient,
+} from '../integrations/jumpseller/jumpseller.client.js';
 
 @Injectable()
 export class CatalogService {
@@ -29,82 +42,23 @@ export class CatalogService {
     private readonly jumpsellerClient: JumpsellerClient,
   ) {}
 
-  // Test method to search for a product by SKU
   async searchProductBySKU(sku: string) {
     return this.jumpsellerClient.searchProductBySKU(sku);
   }
 
   async getCategories() {
-    return this.db.select().from(categories);
+    return this.db
+      .select()
+      .from(categories);
   }
 
   async getSeries() {
-    return this.db.select().from(series);
-  }
-
-  
-  /**
-  async getPublications() {
-    return this.db.select().from(publications);
-  }
-    //==========================
-
-  async getPublications(search?: string) {
-  if (search) {
     return this.db
       .select()
-      .from(publications)
-      .where(ilike(publications.title, `%${search}%`));
+      .from(series);
   }
 
-  return this.db.select().from(publications);
-}
-
-
-async getPublications(
-  search?: string,
-  page = 1,
-  limit = 20,
-) {
-  const safePage = Math.max(1, page);
-  const safeLimit = Math.min(Math.max(1, limit), 100);
-
-  const offset = (safePage - 1) * safeLimit;
-
-  const whereCondition = search
-    ? ilike(publications.title, `%${search}%`)
-    : undefined;
-
-  const data = await this.db
-    .select()
-    .from(publications)
-    .where(whereCondition)
-    .limit(safeLimit)
-    .offset(offset);
-
-  const totalResult = await this.db
-    .select({
-      count: count(),
-    })
-    .from(publications)
-    .where(whereCondition);
-
-  const total = Number(totalResult[0].count);
-  const totalPages = Math.ceil(total / safeLimit);
-
-  return {
-    data,
-    pagination: {
-      page: safePage,
-      limit: safeLimit,
-      total,
-      totalPages,
-    },
-  };
-}
-*/
-
-async getPublications(
+  async getPublications(
   search?: string,
   category?: string,
   publisher?: string,
@@ -118,30 +72,30 @@ async getPublications(
 
   const conditions = [];
 
-if (search) {
-  conditions.push(
-    ilike(publications.title, `%${search}%`),
-  );
-}
+  if (search) {
+    conditions.push(
+      ilike(publications.title, `%${search}%`),
+    );
+  }
 
-if (category) {
-  conditions.push(
-    ilike(categories.name, `%${category}%`)
-  );
-}
+  if (category) {
+    conditions.push(
+      ilike(categories.name, `%${category}%`),
+    );
+  }
 
-if (publisher) {
-  conditions.push(
-    ilike(publications.publisher, `%${publisher}%`),
-  );
-}
+  if (publisher) {
+    conditions.push(
+      ilike(publications.publisher, `%${publisher}%`),
+    );
+  }
 
-const whereCondition =
-  conditions.length > 0
-    ? and(...conditions)
-    : undefined;
+  const whereCondition =
+    conditions.length > 0
+      ? and(...conditions)
+      : undefined;
 
-  const data = await this.db
+  const publicationsResult = await this.db
     .select({
       id: publications.id,
       seriesId: publications.seriesId,
@@ -167,6 +121,70 @@ const whereCondition =
     .limit(safeLimit)
     .offset(offset);
 
+  const publicationIds =
+    publicationsResult.map(
+      (publication) => publication.id,
+    );
+
+  let offersResult: {
+    publicationId: number;
+    partner: string;
+    partnerSku: string;
+    price: number;
+    stock: number;
+    status: string;
+  }[] = [];
+
+  if (publicationIds.length > 0) {
+    offersResult = await this.db
+      .select({
+        publicationId:
+          publicationPartners.publicationId,
+        partner: partners.name,
+        partnerSku: offers.partnerSku,
+        price: offers.price,
+        stock: offers.stock,
+        status: offers.status,
+      })
+      .from(offers)
+      .innerJoin(
+        publicationPartners,
+        eq(
+          offers.publicationPartnerId,
+          publicationPartners.id,
+        ),
+      )
+      .innerJoin(
+        partners,
+        eq(
+          publicationPartners.partnerId,
+          partners.id,
+        ),
+      )
+      .where(
+        inArray(
+          publicationPartners.publicationId,
+          publicationIds,
+        ),
+      );
+  }
+
+  const data = publicationsResult.map(
+    (publication) => ({
+      ...publication,
+
+      offers: offersResult.filter(
+        (offer) =>
+          offer.publicationId === publication.id,
+      ).map(
+        ({
+          publicationId,
+          ...offer
+        }) => offer,
+      ),
+    }),
+  );
+
   const totalResult = await this.db
     .select({
       count: count(),
@@ -183,7 +201,9 @@ const whereCondition =
     .where(whereCondition);
 
   const total = Number(totalResult[0].count);
-  const totalPages = Math.ceil(total / safeLimit);
+  const totalPages = Math.ceil(
+    total / safeLimit,
+  );
 
   return {
     data,
@@ -196,47 +216,72 @@ const whereCondition =
   };
 }
 
+  async getPublicationDetail(
+    publicationId: number,
+  ) {
+    const publicationResult =
+      await this.db
+        .select()
+        .from(publications)
+        .where(
+          eq(
+            publications.id,
+            publicationId,
+          ),
+        );
 
+    if (
+      publicationResult.length === 0
+    ) {
+      throw new NotFoundException(
+        `Publication with id ${publicationId} not found`,
+      );
+    }
 
-  async getPublicationDetail(publicationId: number) {
-  const publicationResult = await this.db
-    .select()
-    .from(publications)
-    .where(eq(publications.id, publicationId));
+    const publication =
+      publicationResult[0];
 
-  if (publicationResult.length === 0) {
-  throw new NotFoundException(
-    `Publication with id ${publicationId} not found`,
-  );
-}
+    const publicationOffers =
+      await this.db
+        .select({
+          partner:
+            partners.name,
+          partnerSku:
+            offers.partnerSku,
+          price:
+            offers.price,
+          stock:
+            offers.stock,
+          status:
+            offers.status,
+        })
+        .from(offers)
+        .innerJoin(
+          publicationPartners,
+          eq(
+            offers.publicationPartnerId,
+            publicationPartners.id,
+          ),
+        )
+        .innerJoin(
+          partners,
+          eq(
+            publicationPartners.partnerId,
+            partners.id,
+          ),
+        )
+        .where(
+          eq(
+            publicationPartners.publicationId,
+            publicationId,
+          ),
+        )
+        .orderBy(offers.price);
 
-
-  const publication = publicationResult[0];
-
-  const publicationOffers = await this.db
-    .select({
-      partner: partners.name,
-      partnerSku: offers.partnerSku,
-      price: offers.price,
-      stock: offers.stock,
-      status: offers.status,
-    })
-    .from(offers)
-    .innerJoin(
-      publicationPartners,
-      eq(offers.publicationPartnerId, publicationPartners.id),
-    )
-    .innerJoin(
-      partners,
-      eq(publicationPartners.partnerId, partners.id),
-    )
-    .where(eq(publicationPartners.publicationId, publicationId))
-    .orderBy(offers.price);
-
-  return {
-    ...publication,
-    offers: publicationOffers,
-  };
-
-}
+    return {
+      ...publication,
+      offers:
+        publicationOffers,
+    };
+  }
 }
