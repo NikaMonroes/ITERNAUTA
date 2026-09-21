@@ -21,7 +21,6 @@ export class PartnersController {
     private readonly partnersService: PartnersService,
   ) {}
 
-  @Get()
   @ApiOperation({
     summary: 'Obtener partners',
     description:
@@ -31,15 +30,15 @@ export class PartnersController {
     status: 200,
     description: 'Lista de partners.',
   })
+  @Get()
   findAll() {
     return this.partnersService.findAll()
   }
 
-  @Get(':id')
   @ApiOperation({
     summary: 'Obtener partner por ID',
     description:
-      'Obtiene la información de un partner específico.',
+      'Obtiene la informaciÃ³n de un partner especÃ­fico.',
   })
   @ApiParam({
     name: 'id',
@@ -55,6 +54,7 @@ export class PartnersController {
     status: 404,
     description: 'Partner no encontrado.',
   })
+  @Get(':id')
   findById(
     @Param('id', ParseIntPipe) id: number,
   ) {

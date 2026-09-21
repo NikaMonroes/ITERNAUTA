@@ -28,7 +28,7 @@ export class OffersController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Lista de ofertas.',
+    description: 'Lista de ofertas disponibles.',
   })
   @Get()
   findAll() {
@@ -50,11 +50,6 @@ export class OffersController {
     status: 200,
     description:
       'Lista de ofertas disponibles para la publicación.',
-  })
-  @ApiResponse({
-    status: 404,
-    description:
-      'La publicación no existe.',
   })
   @Get('publication/:publicationId')
   findByPublicationId(
