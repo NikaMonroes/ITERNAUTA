@@ -1,0 +1,380 @@
+.publication-detail {
+  width: 100%;
+  padding: 32px 0 64px;
+}
+
+.publication-detail-container {
+  width: min(1120px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+/* Volver */
+
+.back-button {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  padding: 9px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.back-button:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  transform: translateX(-2px);
+}
+
+/* Publicación */
+
+.publication-hero {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 56px;
+  margin-top: 28px;
+}
+
+.publication-cover {
+  min-height: 480px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+}
+
+.publication-cover img {
+  width: 100%;
+  max-height: 500px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.publication-cover-empty {
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  font-size: 48px;
+}
+
+.publication-cover-empty span {
+  font-size: 14px;
+}
+
+/* Información */
+
+.publication-info {
+  padding-top: 12px;
+}
+
+.publication-label {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.publication-info h1 {
+  margin: 0 0 24px;
+  font-size: clamp(32px, 4vw, 48px);
+  line-height: 1.08;
+  letter-spacing: -1px;
+  color: var(--text-h);
+}
+
+/* Metadatos */
+
+.publication-meta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.publication-meta > div {
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.publication-meta span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.publication-meta strong {
+  display: block;
+  color: var(--text-h);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+/* Descripción */
+
+.publication-description {
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.publication-description h2 {
+  margin: 0 0 16px;
+  color: var(--text-h);
+  font-size: 21px;
+}
+
+.publication-description > div {
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.publication-description p {
+  margin: 0 0 14px;
+}
+
+.publication-description br {
+  line-height: 1.7;
+}
+
+/* Ofertas */
+
+.offers-section {
+  margin-top: 72px;
+  padding-top: 36px;
+  border-top: 1px solid var(--border);
+}
+
+.section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.section-heading h2 {
+  margin: 0;
+  color: var(--text-h);
+  font-size: 28px;
+}
+
+.offer-count {
+  color: var(--text);
+  font-size: 14px;
+}
+
+/* Grid */
+
+.offers-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+/* Oferta */
+
+.offer-card {
+  padding: 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.offer-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
+
+.offer-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.partner-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--accent-bg);
+  font-size: 20px;
+}
+
+.offer-header span {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--text);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.offer-header h3 {
+  margin: 0;
+  color: var(--text-h);
+  font-size: 17px;
+}
+
+/* Precio */
+
+.offer-price {
+  margin: 24px 0 20px;
+  color: var(--text-h);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+/* Datos */
+
+.offer-data {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.offer-data > div {
+  padding: 12px;
+  background: var(--accent-bg);
+  border-radius: 10px;
+}
+
+.offer-data span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.offer-data strong {
+  color: var(--text-h);
+  font-size: 14px;
+}
+
+.status-available {
+  color: #2e9b62 !important;
+}
+
+.status-unavailable {
+  color: #a95b5b !important;
+}
+
+/* SKU */
+
+.offer-sku {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+/* Sin ofertas */
+
+.no-offers {
+  padding: 48px 24px;
+  text-align: center;
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+  color: var(--text);
+}
+
+.no-offers span {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 32px;
+}
+
+.no-offers p {
+  margin: 0;
+}
+
+/* Estados */
+
+.publication-state {
+  padding: 48px 0;
+  text-align: center;
+}
+
+.publication-alert {
+  padding: 18px;
+  border-radius: 12px;
+}
+
+.publication-alert-error {
+  background: rgba(180, 70, 70, 0.12);
+  border: 1px solid rgba(180, 70, 70, 0.3);
+}
+
+.publication-alert-warning {
+  background: rgba(190, 150, 60, 0.12);
+  border: 1px solid rgba(190, 150, 60, 0.3);
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  .publication-hero {
+    grid-template-columns: 280px 1fr;
+    gap: 32px;
+  }
+
+  .publication-meta {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .publication-detail {
+    padding-top: 20px;
+  }
+
+  .publication-detail-container {
+    width: min(100% - 24px, 560px);
+  }
+
+  .publication-hero {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .publication-cover {
+    min-height: auto;
+  }
+
+  .publication-cover img {
+    max-height: 430px;
+  }
+
+  .offers-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
