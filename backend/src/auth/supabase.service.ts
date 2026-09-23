@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common'
-import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import {
+  createClient,
+  SupabaseClient,
+} from '@supabase/supabase-js'
 
 @Injectable()
 export class SupabaseService {
@@ -7,7 +10,8 @@ export class SupabaseService {
 
   constructor() {
     const url = process.env.SUPABASE_URL
-    const publishableKey = process.env.SUPABASE_PUBLISHABLE_KEY
+    const publishableKey =
+      process.env.SUPABASE_PUBLISHABLE_KEY
 
     if (!url || !publishableKey) {
       throw new Error(
@@ -15,7 +19,10 @@ export class SupabaseService {
       )
     }
 
-    this.client = createClient(url, publishableKey)
+    this.client = createClient(
+      url,
+      publishableKey,
+    )
   }
 
   getClient(): SupabaseClient {

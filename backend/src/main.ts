@@ -1,9 +1,12 @@
 import 'dotenv/config'
+
 import { NestFactory } from '@nestjs/core'
+
 import {
   SwaggerModule,
   DocumentBuilder,
 } from '@nestjs/swagger'
+
 import { AppModule } from './app.module.js'
 
 async function bootstrap() {
@@ -19,6 +22,14 @@ async function bootstrap() {
       'API REST para la biblioteca virtual de mangas, cómics y novelas gráficas de ITERNAUTA.',
     )
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'access-token',
+    )
     .build()
 
   const document = SwaggerModule.createDocument(
@@ -26,9 +37,15 @@ async function bootstrap() {
     config,
   )
 
-  SwaggerModule.setup('api', app, document)
+  SwaggerModule.setup(
+    'api',
+    app,
+    document,
+  )
 
-  await app.listen(process.env.PORT ?? 3000)
+  await app.listen(
+    process.env.PORT ?? 3000,
+  )
 }
 
 await bootstrap()
