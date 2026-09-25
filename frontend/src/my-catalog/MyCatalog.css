@@ -429,3 +429,24 @@
     padding: 10px;
   }
 }
+
+.collection-remove-button {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  padding: 7px 12px;
+  margin-top: 1rem;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.collection-remove-button:hover {
+  background: rgba(180, 70, 70, 0.12);
+  border-color: rgba(180, 70, 70, 0.4);
+  color: #a95b5b;
+}

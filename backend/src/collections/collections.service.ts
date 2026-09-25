@@ -143,8 +143,75 @@ export class CollectionsService {
   }
   
   async findCollectionItems(
+    identityProviderId: string,
+    collectionId: number,
+  ) {
+    const user =
+      await this.usersService.findByIdentityProviderId(
+        identityProviderId,
+      )
+
+    if (!user) {
+      throw new NotFoundException(
+        'Usuario no registrado en ITERNAUTA',
+      )
+    }
+
+    const collection = await this.db
+      .select()
+      .from(collections)
+      .where(
+        and(
+          eq(collections.id, collectionId),
+          eq(collections.userId, user.id),
+        ),
+      )
+      .limit(1)
+
+    if (!collection[0]) {
+      throw new NotFoundException(
+        'Colección no encontrada',
+      )
+    }
+
+    return this.db
+      .select({
+        id: collectionItems.id,
+        collectionId: collectionItems.collectionId,
+        publicationId: publications.id,
+        title: publications.title,
+        volume: publications.volume,
+        publisher: publications.publisher,
+        isbn: publications.isbn,
+        coverUrl: publications.coverUrl,
+        description: publications.description,
+        addedAt: collectionItems.createdAt,
+      })
+      .from(collectionItems)
+      .innerJoin(
+        publications,
+        eq(
+          collectionItems.publicationId,
+          publications.id,
+        ),
+      )
+      .where(
+        eq(
+          collectionItems.collectionId,
+          collectionId,
+        ),
+      )
+  }
+
+
+
+
+  // delete publication de Mi coleccion
+
+  async removePublication(
   identityProviderId: string,
   collectionId: number,
+  publicationId: number,
 ) {
   const user =
     await this.usersService.findByIdentityProviderId(
@@ -174,33 +241,41 @@ export class CollectionsService {
     )
   }
 
-  return this.db
-    .select({
-      id: collectionItems.id,
-      collectionId: collectionItems.collectionId,
-      publicationId: publications.id,
-      title: publications.title,
-      volume: publications.volume,
-      publisher: publications.publisher,
-      isbn: publications.isbn,
-      coverUrl: publications.coverUrl,
-      description: publications.description,
-      addedAt: collectionItems.createdAt,
-    })
+  const existingItem = await this.db
+    .select()
     .from(collectionItems)
-    .innerJoin(
-      publications,
-      eq(
-        collectionItems.publicationId,
-        publications.id,
+    .where(
+      and(
+        eq(
+          collectionItems.collectionId,
+          collectionId,
+        ),
+        eq(
+          collectionItems.publicationId,
+          publicationId,
+        ),
       ),
     )
+    .limit(1)
+
+  if (!existingItem[0]) {
+    throw new NotFoundException(
+      'La publicación no está en esta colección',
+    )
+  }
+
+  await this.db
+    .delete(collectionItems)
     .where(
       eq(
-        collectionItems.collectionId,
-        collectionId,
+        collectionItems.id,
+        existingItem[0].id,
       ),
     )
-}
 
+  return {
+    message:
+      'Publicación eliminada de la colección',
+  }
+}
 }

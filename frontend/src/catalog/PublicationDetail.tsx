@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { apiGet } from '../lib/api'
+import { apiGet, apiPost } from '../lib/api'
+import { useAuth } from '../auth/AuthContext'
 import './PublicationDetail.css'
 
 interface Offer {
@@ -20,28 +21,110 @@ interface PublicationDetail {
   coverUrl: string | null
   description: string | null
   offers: Offer[]
+  categoryId: number
+  category: string
 }
 
 interface PublicationDetailProps {
   publicationId: number
 }
 
+interface Collection {
+  id: number
+  userId: number
+  name: string
+  type: 'SYSTEM' | 'CUSTOM'
+  createdAt: string
+  updatedAt: string
+}
+
 function PublicationDetail({
   publicationId,
 }: PublicationDetailProps) {
+  const { user } = useAuth()
+
+  // Estado de la publicación
   const [publication, setPublication] =
     useState<PublicationDetail | null>(null)
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // Estado para agregar a colección
+  const [adding, setAdding] = useState(false)
+  const [addMessage, setAddMessage] =
+    useState<string | null>(null)
+
+  /**
+   * Agrega la publicación a la colección
+   * correspondiente según su categoría.
+   */
+  async function handleAddToCollection() {
+    if (!user) {
+      window.location.href = '/login'
+      return
+    }
+
+    if (!publication) {
+      return
+    }
+
+    setAdding(true)
+    setAddMessage(null)
+
+    try {
+      const collections = await apiGet<Collection[]>(
+        '/collections',
+      )
+
+      const collectionName =
+        publication.category?.toLowerCase() === 'manga'
+          ? 'manga'
+          : 'cómic'
+
+      const collection = collections.find(
+        (item) =>
+          item.name.toLowerCase() === collectionName,
+      )
+
+      if (!collection) {
+        throw new Error(
+          `No encontramos tu colección de ${collectionName}.`,
+        )
+      }
+
+      await apiPost(
+        `/collections/${collection.id}/items`,
+        {
+          publicationId: publication.id,
+        },
+      )
+
+      setAddMessage(
+        `✓ ${publication.title} fue añadida a tu colección.`,
+      )
+    } catch (err) {
+      setAddMessage(
+        err instanceof Error
+          ? err.message
+          : 'No pudimos añadir la publicación.',
+      )
+    } finally {
+      setAdding(false)
+    }
+  }
+
+  /**
+   * Carga el detalle de la publicación.
+   */
   useEffect(() => {
     async function loadPublication() {
       try {
-        const response =
-          await apiGet<PublicationDetail>(
-            `/catalog/publications/${publicationId}`,
-          )
+        const response = await apiGet<PublicationDetail>(
+          `/catalog/publications/${publicationId}`,
+        )
+        // console.log(response)
+        console.log('PUBLICATION DETAIL:', response)
 
         setPublication(response)
       } catch (err) {
@@ -58,6 +141,9 @@ function PublicationDetail({
     loadPublication()
   }, [publicationId])
 
+  /**
+   * Estado de carga.
+   */
   if (loading) {
     return (
       <main className="publication-detail">
@@ -70,6 +156,9 @@ function PublicationDetail({
     )
   }
 
+  /**
+   * Estado de error.
+   */
   if (error) {
     return (
       <main className="publication-detail">
@@ -82,84 +171,88 @@ function PublicationDetail({
     )
   }
 
-if (!publication) {
-  return (
-    <main className="publication-detail">
-      <div className="publication-detail-container">
-        <div className="publication-alert publication-alert-warning">
-          Publicación no encontrada.
+  /**
+   * Publicación no encontrada.
+   */
+  if (!publication) {
+    return (
+      <main className="publication-detail">
+        <div className="publication-detail-container">
+          <div className="publication-alert publication-alert-warning">
+            Publicación no encontrada.
+          </div>
         </div>
-      </div>
-    </main>
-  )
-}
+      </main>
+    )
+  }
 
-const params = new URLSearchParams(
-  window.location.search,
-)
-
-const from = params.get('from')
-
+  /**
+   * Determina desde qué sección llegó el usuario.
+   */
+  
 
   return (
     <main className="publication-detail">
       <div className="publication-detail-container">
 
+        {/* Botón volver */}
         <button
-  type="button"
-  className="back-button"
-  onClick={() => {
-    const params = new URLSearchParams(
-      window.location.search,
-    )
+          type="button"
+          className="back-button"
+          onClick={() => {
+            const params = new URLSearchParams(
+              window.location.search,
+            )
 
-    const from = params.get('from')
+            const from = params.get('from')
 
-    window.location.href =
-      from === 'my-catalog'
-        ? '/my-catalog'
-        : '/catalog'
-  }}
->
-  ← {from === 'my-catalog'
-    ? 'Volver a Mi Catálogo'
-    : 'Volver al Catálogo'}
-</button>
+            window.location.href =
+              from === 'my-catalog'
+                ? '/my-catalog'
+                : '/catalog'
+          }}
+        >
+          ← Volver al catálogo
+        </button>
 
-        <section className="publication-hero">
+        {/* Información principal */}
+        <section className="publication-main">
 
+          {/* Portada */}
           <div className="publication-cover">
             {publication.coverUrl ? (
               <img
                 src={publication.coverUrl}
-                alt={publication.title}
+                alt={`Portada de ${publication.title}`}
               />
             ) : (
-              <div className="publication-cover-empty">
-                📚
-                <span>Sin portada</span>
+              <div className="publication-cover-placeholder">
+                Sin portada
               </div>
             )}
           </div>
 
+          {/* Información */}
           <div className="publication-info">
 
             <span className="publication-label">
-              PUBLICACIÓN
+              {publication.category}
             </span>
 
             <h1>{publication.title}</h1>
 
+            {publication.volume !== null && (
+              <p className="publication-volume">
+                Volumen {publication.volume}
+              </p>
+            )}
+
+            {/* Metadatos */}
             <div className="publication-meta">
-              <div>
-                <span>📖 Volumen</span>
-                <strong>
-                  {publication.volume ?? 'N/A'}
-                </strong>
-              </div>
 
               <div>
-                <span>🏷️ Editorial</span>
+                <span>Editorial</span>
+
                 <strong>
                   {publication.publisher ?? 'N/A'}
                 </strong>
@@ -167,30 +260,55 @@ const from = params.get('from')
 
               <div>
                 <span>🔖 ISBN</span>
+
                 <strong>
                   {publication.isbn ?? 'N/A'}
                 </strong>
               </div>
+
             </div>
 
-            {publication.description && (
-              <div className="publication-description">
-                <h2>Descripción</h2>
+            {/* Agregar a colección */}
+            <div className="publication-actions">
+              <button
+                type="button"
+                className="collection-button"
+                onClick={handleAddToCollection}
+                disabled={adding}
+              >
+                {adding
+                  ? 'Añadiendo...'
+                  : 'Añadir a mi colección'}
+              </button>
 
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: publication.description,
-                  }}
-                />
-              </div>
-            )}
+              {addMessage && (
+                <p className="collection-message">
+                  {addMessage}
+                </p>
+              )}
+            </div>
 
           </div>
         </section>
 
+        {/* Descripción */}
+        {publication.description && (
+          <section className="publication-description">
+            <h2>Descripción</h2>
+
+            <div
+              dangerouslySetInnerHTML={{
+                __html: publication.description,
+              }}
+            />
+          </section>
+        )}
+
+        {/* Ofertas */}
         <section className="offers-section">
 
           <div className="section-heading">
+
             <div>
               <span className="publication-label">
                 DISPONIBILIDAD
@@ -205,11 +323,14 @@ const from = params.get('from')
                 ? 'oferta'
                 : 'ofertas'}
             </span>
+
           </div>
 
+          {/* Sin ofertas */}
           {publication.offers.length === 0 ? (
             <div className="no-offers">
               <span>🌌</span>
+
               <p>
                 Actualmente no hay ofertas para esta
                 publicación.
@@ -220,7 +341,6 @@ const from = params.get('from')
 
               {publication.offers.map(
                 (offer, index) => {
-
                   const available =
                     offer.status === 'available' &&
                     offer.stock > 0
@@ -231,22 +351,24 @@ const from = params.get('from')
                       key={`${offer.partner}-${index}`}
                     >
 
+                      {/* Partner */}
                       <div className="offer-header">
+
                         <div className="partner-icon">
-                          🏪
+                          🪐
                         </div>
 
                         <div>
-                          <span>
-                            Partner
-                          </span>
+                          <span>Partner</span>
 
                           <h3>
                             {offer.partner}
                           </h3>
                         </div>
+
                       </div>
 
+                      {/* Precio */}
                       <div className="offer-price">
                         $
                         {offer.price.toLocaleString(
@@ -254,10 +376,12 @@ const from = params.get('from')
                         )}
                       </div>
 
+                      {/* Datos */}
                       <div className="offer-data">
 
                         <div>
                           <span>📦 Stock</span>
+
                           <strong>
                             {offer.stock}
                           </strong>
@@ -281,6 +405,7 @@ const from = params.get('from')
 
                       </div>
 
+                      {/* SKU */}
                       {offer.partnerSku && (
                         <div className="offer-sku">
                           SKU: {offer.partnerSku}

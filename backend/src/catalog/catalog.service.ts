@@ -216,6 +216,98 @@ export class CatalogService {
   };
 }
 
+async getPublicationDetail(
+  publicationId: number,
+) {
+  const publicationResult =
+    await this.db
+      .select({
+        id: publications.id,
+        seriesId: publications.seriesId,
+        title: publications.title,
+        volume: publications.volume,
+        publisher: publications.publisher,
+        isbn: publications.isbn,
+        coverUrl: publications.coverUrl,
+        description: publications.description,
+        createdAt: publications.createdAt,
+        updatedAt: publications.updatedAt,
+
+        categoryId: categories.id,
+        category: categories.name,
+      })
+      .from(publications)
+      .innerJoin(
+        series,
+        eq(publications.seriesId, series.id),
+      )
+      .innerJoin(
+        categories,
+        eq(series.categoryId, categories.id),
+      )
+      .where(
+        eq(
+          publications.id,
+          publicationId,
+        ),
+      )
+
+  if (
+    publicationResult.length === 0
+  ) {
+    throw new NotFoundException(
+      `Publication with id ${publicationId} not found`,
+    )
+  }
+
+  const publication =
+    publicationResult[0]
+
+  const publicationOffers =
+    await this.db
+      .select({
+        partner:
+          partners.name,
+        partnerSku:
+          offers.partnerSku,
+        price:
+          offers.price,
+        stock:
+          offers.stock,
+        status:
+          offers.status,
+      })
+      .from(offers)
+      .innerJoin(
+        publicationPartners,
+        eq(
+          offers.publicationPartnerId,
+          publicationPartners.id,
+        ),
+      )
+      .innerJoin(
+        partners,
+        eq(
+          publicationPartners.partnerId,
+          partners.id,
+        ),
+      )
+      .where(
+        eq(
+          publicationPartners.publicationId,
+          publicationId,
+        ),
+      )
+      .orderBy(offers.price)
+
+  return {
+    ...publication,
+    offers: publicationOffers,
+  }
+}
+
+
+/*
   async getPublicationDetail(
     publicationId: number,
   ) {
@@ -283,5 +375,5 @@ export class CatalogService {
       offers:
         publicationOffers,
     };
-  }
+  }*/
 }

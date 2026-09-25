@@ -4,6 +4,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Delete,
   Body,
   Req,
   UnauthorizedException,
@@ -71,58 +72,61 @@ export class CollectionsController {
       user.id,
     )
   }
-
+  
   @Get(':collectionId/items')
-@UseGuards(SupabaseAuthGuard)
-@ApiOperation({
-  summary: 'Obtener publicaciones de una colección',
-  description:
-    'Obtiene las publicaciones almacenadas en una colección perteneciente al usuario autenticado.',
-})
-@ApiParam({
-  name: 'collectionId',
-  type: Number,
-  description:
-    'Identificador de la colección.',
-})
-@ApiResponse({
-  status: 200,
-  description:
-    'Publicaciones de la colección obtenidas correctamente.',
-})
-@ApiResponse({
-  status: 401,
-  description:
-    'Token de autenticación requerido o inválido.',
-})
-@ApiResponse({
-  status: 404,
-  description:
-    'Colección no encontrada.',
-})
-async findCollectionItems(
-  @Param(
-    'collectionId',
-    ParseIntPipe,
-  )
-  collectionId: number,
+  @UseGuards(SupabaseAuthGuard)
+  @ApiOperation({
+    summary: 'Obtener publicaciones de una colección',
+    description:
+      'Obtiene las publicaciones pertenecientes a una colección del usuario autenticado.',
+  })
+  @ApiParam({
+    name: 'collectionId',
+    type: Number,
+    description:
+      'Identificador de la colección.',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Publicaciones de la colección obtenidas correctamente.',
+  })
+  @ApiResponse({
+    status: 401,
+    description:
+      'Token de autenticación requerido o inválido.',
+  })
+  @ApiResponse({
+    status: 404,
+    description:
+      'La colección no existe o no pertenece al usuario.',
+  })
+  async findCollectionItems(
+    @Param(
+      'collectionId',
+      ParseIntPipe,
+    )
+    collectionId: number,
 
-  @Req()
-  request: Request,
-) {
-  const user = request.user
+    @Req()
+    request: Request,
+  ) {
+    const user = request.user
 
-  if (!user) {
-    throw new UnauthorizedException(
-      'Usuario autenticado no encontrado',
+    if (!user) {
+      throw new UnauthorizedException(
+        'Usuario autenticado no encontrado',
+      )
+    }
+
+    return this.collectionsService.findCollectionItems(
+      user.id,
+      collectionId,
     )
   }
 
-  return this.collectionsService.findCollectionItems(
-    user.id,
-    collectionId,
-  )
-}
+
+
 
   @Post(':collectionId/items')
   @UseGuards(SupabaseAuthGuard)
@@ -192,4 +196,71 @@ async findCollectionItems(
       body.publicationId,
     )
   }
+  @Delete(':collectionId/items/:publicationId')
+  @UseGuards(SupabaseAuthGuard)
+  @ApiOperation({
+    summary: 'Eliminar publicación de una colección',
+    description:
+      'Elimina una publicación de una colección perteneciente al usuario autenticado.',
+  })
+  @ApiParam({
+    name: 'collectionId',
+    type: Number,
+    description:
+      'Identificador de la colección.',
+  })
+  @ApiParam({
+    name: 'publicationId',
+    type: Number,
+    description:
+      'Identificador de la publicación.',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Publicación eliminada correctamente de la colección.',
+  })
+  @ApiResponse({
+    status: 401,
+    description:
+      'Token de autenticación requerido o inválido.',
+  })
+  @ApiResponse({
+    status: 404,
+    description:
+      'La colección o publicación no existe en la colección.',
+  })
+  async removePublication(
+    @Param(
+      'collectionId',
+      ParseIntPipe,
+    )
+    collectionId: number,
+
+    @Param(
+      'publicationId',
+      ParseIntPipe,
+    )
+    publicationId: number,
+
+    @Req()
+    request: Request,
+  ) {
+    const user = request.user
+
+    if (!user) {
+      throw new UnauthorizedException(
+        'Usuario autenticado no encontrado',
+      )
+    }
+
+    return this.collectionsService.removePublication(
+      user.id,
+      collectionId,
+      publicationId,
+    )
+  }
+
+
+
 }

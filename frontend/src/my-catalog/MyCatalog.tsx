@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { apiGet } from '../lib/api'
+import { apiDelete, apiGet } from '../lib/api'
 import './MyCatalog.css'
 
 interface Collection {
@@ -63,27 +63,31 @@ function MyCatalog() {
     loadCollections()
   }, [])
 
-  /*
-  useEffect(() => {
-    async function loadCollectionItems() {
-      try {
-        const response =
-          await apiGet<CollectionItem[]>(
-            '/collections/1/items',
-          )
+  async function handleRemoveFromCollection(
+  collectionId: number,
+  publicationId: number,
+) {
+  try {
+    await apiDelete(
+      `/collections/${collectionId}/items/${publicationId}`,
+    )
 
-        setItems(response)
-      } catch (err) {
-        console.error(
-          'Error cargando publicaciones:',
-          err,
-        )
-      }
-    }
-
-    loadCollectionItems()
-  }, [])
-  */
+    setItems((currentItems) =>
+      currentItems.filter(
+        (item) =>
+          !(
+            item.collectionId === collectionId &&
+            item.publicationId === publicationId
+          ),
+      ),
+    )
+  } catch (error) {
+    console.error(
+      'Error eliminando publicación de la colección:',
+      error,
+    )
+  }
+}
 
   return (
     <main className="my-catalog-page">
@@ -262,65 +266,79 @@ function MyCatalog() {
                 ) : (
                     <div className="collection-publications-grid">
 
-                    {items.map((item) => (
-                        <article
-                        key={item.id}
-                        className="collection-publication-card"
-                        onClick={() => {
-                            window.location.href =
-                             `/catalog/publications/${item.publicationId}?from=my-catalog`
-                            //window.location.href = `/catalog/publications/${item.publicationId}`
-                        }}
-                        role="link"
-                        tabIndex={0}
-                        onKeyDown={(event) => {
-                            if (
-                            event.key === 'Enter' ||
-                            event.key === ' '
-                            ) {
-                            window.location.href =
-                                 `/catalog/publications/${item.publicationId}?from=my-catalog`
-                            }
-                        }}
-                        >
+  {items.map((item) => (
+    <article
+      key={item.id}
+      className="collection-publication-card"
+      onClick={() => {
+        window.location.href =
+          `/catalog/publications/${item.publicationId}?from=my-catalog`
+      }}
+      role="link"
+      tabIndex={0}
+      onKeyDown={(event) => {
+        if (
+          event.key === 'Enter' ||
+          event.key === ' '
+        ) {
+          window.location.href =
+            `/catalog/publications/${item.publicationId}?from=my-catalog`
+        }
+      }}
+    >
 
-                        <div className="collection-publication-cover">
-                            {item.coverUrl ? (
-                            <img
-                                src={item.coverUrl}
-                                alt={item.title}
-                            />
-                            ) : (
-                            <div className="collection-publication-no-cover">
-                                📖
-                            </div>
-                            )}
-                        </div>
+      <div className="collection-publication-cover">
+        {item.coverUrl ? (
+          <img
+            src={item.coverUrl}
+            alt={item.title}
+          />
+        ) : (
+          <div className="collection-publication-no-cover">
+            📖
+          </div>
+        )}
+      </div>
 
-                        <div className="collection-publication-info">
+      <div className="collection-publication-info">
 
-                            <h3>
-                            {item.title}
-                            </h3>
+        <h3>
+          {item.title}
+        </h3>
 
-                            {item.volume !== null && (
-                            <span>
-                                Vol. {item.volume}
-                            </span>
-                            )}
+        {item.volume !== null && (
+          <span>
+            Vol. {item.volume}
+          </span>
+        )}
 
-                            {item.publisher && (
-                            <span>
-                                {item.publisher}
-                            </span>
-                            )}
+        {item.publisher && (
+          <span>
+            {item.publisher}
+          </span>
+        )}
 
-                        </div>
+        <button
+          type="button"
+          className="collection-remove-button"
+          onClick={(event) => {
+            event.stopPropagation()
 
-                        </article>
-                    ))}
+            handleRemoveFromCollection(
+              item.collectionId,
+              item.publicationId,
+            )
+          }}
+        >
+          Quitar de mi colección
+        </button>
 
-                    </div>
+      </div>
+
+    </article>
+  ))}
+
+</div>
                 )}
 
             </div>
