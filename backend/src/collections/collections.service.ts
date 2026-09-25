@@ -14,6 +14,8 @@ import {
   collectionItems,
   collections,
   publications,
+  series,
+  categories,
 } from '../database/schema/index.js'
 
 import { UsersService } from '../users/users.service.js'
@@ -175,32 +177,49 @@ export class CollectionsService {
     }
 
     return this.db
-      .select({
-        id: collectionItems.id,
-        collectionId: collectionItems.collectionId,
-        publicationId: publications.id,
-        title: publications.title,
-        volume: publications.volume,
-        publisher: publications.publisher,
-        isbn: publications.isbn,
-        coverUrl: publications.coverUrl,
-        description: publications.description,
-        addedAt: collectionItems.createdAt,
-      })
-      .from(collectionItems)
-      .innerJoin(
-        publications,
-        eq(
-          collectionItems.publicationId,
-          publications.id,
-        ),
-      )
-      .where(
-        eq(
-          collectionItems.collectionId,
-          collectionId,
-        ),
-      )
+  .select({
+    id: collectionItems.id,
+    collectionId: collectionItems.collectionId,
+    publicationId: publications.id,
+    title: publications.title,
+    volume: publications.volume,
+    publisher: publications.publisher,
+    isbn: publications.isbn,
+    coverUrl: publications.coverUrl,
+    description: publications.description,
+    addedAt: collectionItems.createdAt,
+
+    categoryId: categories.id,
+    category: categories.name,
+  })
+  .from(collectionItems)
+  .innerJoin(
+    publications,
+    eq(
+      collectionItems.publicationId,
+      publications.id,
+    ),
+  )
+  .innerJoin(
+    series,
+    eq(
+      publications.seriesId,
+      series.id,
+    ),
+  )
+  .innerJoin(
+    categories,
+    eq(
+      series.categoryId,
+      categories.id,
+    ),
+  )
+  .where(
+    eq(
+      collectionItems.collectionId,
+      collectionId,
+    ),
+  )
   }
 
 
