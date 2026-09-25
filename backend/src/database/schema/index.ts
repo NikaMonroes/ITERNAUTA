@@ -5,4 +5,5 @@ export * from './partner.schema.js';
 export * from './publication-partner.schema.js';
 export * from './offer.schema.js';
 export * from './user.schema.js';
-
+export * from './collection.schema.js';
+export * from './collection-item.schema.js';

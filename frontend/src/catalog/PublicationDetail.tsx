@@ -82,31 +82,49 @@ function PublicationDetail({
     )
   }
 
-  if (!publication) {
-    return (
-      <main className="publication-detail">
-        <div className="publication-detail-container">
-          <div className="publication-alert publication-alert-warning">
-            Publicación no encontrada.
-          </div>
+if (!publication) {
+  return (
+    <main className="publication-detail">
+      <div className="publication-detail-container">
+        <div className="publication-alert publication-alert-warning">
+          Publicación no encontrada.
         </div>
-      </main>
-    )
-  }
+      </div>
+    </main>
+  )
+}
+
+const params = new URLSearchParams(
+  window.location.search,
+)
+
+const from = params.get('from')
+
 
   return (
     <main className="publication-detail">
       <div className="publication-detail-container">
 
         <button
-          type="button"
-          className="back-button"
-          onClick={() => {
-            window.location.href = '/catalog'
-          }}
-        >
-          ← Volver al catálogo
-        </button>
+  type="button"
+  className="back-button"
+  onClick={() => {
+    const params = new URLSearchParams(
+      window.location.search,
+    )
+
+    const from = params.get('from')
+
+    window.location.href =
+      from === 'my-catalog'
+        ? '/my-catalog'
+        : '/catalog'
+  }}
+>
+  ← {from === 'my-catalog'
+    ? 'Volver a Mi Catálogo'
+    : 'Volver al Catálogo'}
+</button>
 
         <section className="publication-hero">
 

@@ -6,6 +6,7 @@ import Account from './auth/Account'
 
 import Catalog from './catalog/Catalog'
 import PublicationDetail from './catalog/PublicationDetail'
+import MyCatalog from './my-catalog/MyCatalog'
 
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
@@ -14,6 +15,10 @@ import {
   AuthProvider,
   useAuth,
 } from './auth/AuthContext'
+
+// Imports del catálogo
+
+
 
 function AppContent() {
   const path = window.location.pathname
@@ -45,6 +50,10 @@ function AppContent() {
 
   } else if (path === '/account') {
   content = <Account />
+
+  } else if (path === '/my-catalog') {
+  content = <MyCatalog />
+
   } else if (
     path.startsWith('/catalog/publications/')
   ) {

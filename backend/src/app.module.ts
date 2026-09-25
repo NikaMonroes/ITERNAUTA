@@ -6,6 +6,8 @@ import { UsersModule } from './users/users.module.js'
 import { AuthModule } from './auth/auth.module.js'
 import { PartnersModule } from './partners/partners.module.js'
 import { SpookyModule } from './integrations/spooky/spooky.module.js'
+import { CollectionsModule } from './collections/collections.module.js'
+
 
 @Module({
   imports: [
@@ -16,6 +18,7 @@ import { SpookyModule } from './integrations/spooky/spooky.module.js'
     AuthModule,
     PartnersModule,
     SpookyModule,
+    CollectionsModule,
   ],
 })
 export class AppModule {}

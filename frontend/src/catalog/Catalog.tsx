@@ -345,7 +345,7 @@ function Catalog() {
                     >
                       <a
                         href={`/catalog/publications/${publication.id}`}
-                        className="publication-cover"
+                        className="catalog-publication-cover"
                       >
                         {publication.coverUrl ? (
                           <img
