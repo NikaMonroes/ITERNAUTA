@@ -233,23 +233,23 @@ function MyCatalog() {
             <div className="collection-publications">
 
                 <div className="collections-heading">
-                    <div>
-                    <span className="collections-kicker">
-                        PUBLICACIONES
-                    </span>
+  <div>
+    <span className="collections-kicker">
+      TU BIBLIOTECA
+    </span>
 
-                    <h2>
-                        Historias guardadas
-                    </h2>
-                    </div>
+    <h2>
+      Tienes en tu colección
+    </h2>
+  </div>
 
-                    <span className="collections-count">
-                    {items.length}{' '}
-                    {items.length === 1
-                        ? 'publicación'
-                        : 'publicaciones'}
-                    </span>
-                </div>
+  <span className="collections-count">
+    {items.length}{' '}
+    {items.length === 1
+      ? 'publicación'
+      : 'publicaciones'}
+  </span>
+</div>
 
                 {items.length === 0 ? (
                     <div className="my-catalog-state">
