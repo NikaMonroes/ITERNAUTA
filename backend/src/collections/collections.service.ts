@@ -9,6 +9,8 @@ import { and, eq } from 'drizzle-orm'
 
 import { DATABASE_CONNECTION } from '../database/database.provider.js'
 import type { Database } from '../database/database.provider.js'
+// import de PlanService
+import { PlanService } from '../plan/plan.service.js'
 
 import {
   collectionItems,
@@ -24,6 +26,8 @@ import { UsersService } from '../users/users.service.js'
 export class CollectionsService {
   constructor(
     private readonly usersService: UsersService,
+    // PlanService
+    private readonly planService: PlanService,
 
     @Inject(DATABASE_CONNECTION)
     private readonly db: Database,
@@ -107,6 +111,17 @@ export class CollectionsService {
     if (!publication[0]) {
       throw new NotFoundException(
         'Publicación no encontrada',
+      )
+    }
+
+    const storage =
+      await this.planService.canAddPublication(
+        identityProviderId,
+      )
+
+    if (!storage.allowed) {
+      throw new ConflictException(
+        'Has alcanzado el límite de almacenamiento de tu plan. Actualiza tu plan para guardar más publicaciones.',
       )
     }
 

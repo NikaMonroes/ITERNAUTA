@@ -17,5 +17,8 @@ import { UsersModule } from '../users/users.module.js'
   providers: [
     PlanService,
   ],
+  exports: [
+    PlanService,
+  ],
 })
 export class PlanModule {}

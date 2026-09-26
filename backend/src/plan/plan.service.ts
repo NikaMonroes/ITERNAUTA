@@ -28,6 +28,8 @@ import {
 
 @Injectable()
 export class PlanService {
+  private readonly FREE_STORAGE_LIMIT = 100
+
   constructor(
     private readonly usersService: UsersService,
 
@@ -49,30 +51,11 @@ export class PlanService {
       )
     }
 
-    const result = await this.db
-      .select({
-        count: count(),
-      })
-      .from(collectionItems)
-      .innerJoin(
-        collections,
-        eq(
-          collectionItems.collectionId,
-          collections.id,
-        ),
-      )
-      .where(
-        eq(
-          collections.userId,
-          user.id,
-        ),
-      )
+    const used =
+      await this.getUsedStorage(user.id)
 
-    const used = Number(
-      result[0]?.count ?? 0,
-    )
-
-    const limit = 100
+    const limit =
+      this.FREE_STORAGE_LIMIT
 
     const available = Math.max(
       0,
@@ -92,5 +75,63 @@ export class PlanService {
         customCollections: false,
       },
     }
+  }
+
+  async canAddPublication(
+    identityProviderId: string,
+  ) {
+    const user =
+      await this.usersService.findByIdentityProviderId(
+        identityProviderId,
+      )
+
+    if (!user) {
+      throw new NotFoundException(
+        'Usuario no registrado en ITERNAUTA',
+      )
+    }
+
+    const used =
+      await this.getUsedStorage(user.id)
+
+    const limit =
+      this.FREE_STORAGE_LIMIT
+
+    return {
+      allowed: used < limit,
+      used,
+      limit,
+      available: Math.max(
+        0,
+        limit - used,
+      ),
+    }
+  }
+
+  private async getUsedStorage(
+    userId: number,
+  ) {
+    const result = await this.db
+      .select({
+        count: count(),
+      })
+      .from(collectionItems)
+      .innerJoin(
+        collections,
+        eq(
+          collectionItems.collectionId,
+          collections.id,
+        ),
+      )
+      .where(
+        eq(
+          collections.userId,
+          userId,
+        ),
+      )
+
+    return Number(
+      result[0]?.count ?? 0,
+    )
   }
 }
