@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module.js'
 import { PartnersModule } from './partners/partners.module.js'
 import { SpookyModule } from './integrations/spooky/spooky.module.js'
 import { CollectionsModule } from './collections/collections.module.js'
+import { PlanModule } from './plan/plan.module.js'
 
 
 @Module({
@@ -19,6 +20,7 @@ import { CollectionsModule } from './collections/collections.module.js'
     PartnersModule,
     SpookyModule,
     CollectionsModule,
+    PlanModule,
   ],
 })
 export class AppModule {}
