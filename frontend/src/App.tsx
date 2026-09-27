@@ -7,6 +7,7 @@ import Account from './auth/Account'
 import Catalog from './catalog/Catalog'
 import PublicationDetail from './catalog/PublicationDetail'
 import MyCatalog from './my-catalog/MyCatalog'
+import About from './about/About'
 
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
@@ -53,6 +54,9 @@ function AppContent() {
 
   } else if (path === '/my-catalog') {
   content = <MyCatalog />
+
+  } else if (path === '/about') {
+    content = <About />
 
   } else if (
     path.startsWith('/catalog/publications/')
