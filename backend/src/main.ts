@@ -19,7 +19,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('ITERNAUTA API')
     .setDescription(
-      'API REST para la biblioteca virtual de mangas, cómics y novelas gráficas de ITERNAUTA.',
+      'API REST para la biblioteca virtual de manga y cómics de ITERNAUTA.',
     )
     .setVersion('1.0')
     .addBearerAuth(

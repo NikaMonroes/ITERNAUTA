@@ -8,6 +8,7 @@ import { PartnersModule } from './partners/partners.module.js'
 import { SpookyModule } from './integrations/spooky/spooky.module.js'
 import { CollectionsModule } from './collections/collections.module.js'
 import { PlanModule } from './plan/plan.module.js'
+import { AboutModule } from './about/about.module.js'
 
 
 @Module({
@@ -21,6 +22,7 @@ import { PlanModule } from './plan/plan.module.js'
     SpookyModule,
     CollectionsModule,
     PlanModule,
+    AboutModule,
   ],
 })
 export class AppModule {}

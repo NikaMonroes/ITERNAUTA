@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700&display=swap');
+
 .site-footer {
   margin-top: auto;
   border-top: 1px solid var(--border);
@@ -20,7 +22,10 @@
 .footer-brand h2 {
   margin: 0 0 10px;
   color: var(--text-h);
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 200;  
   font-size: 20px;
+  letter-spacing: 0.08em;
 }
 
 .footer-brand p,
@@ -94,4 +99,13 @@
   .footer-bottom {
     padding: 18px 20px;
   }
+}
+
+.footer-bottom a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.footer-bottom a:hover {
+  color: var(--accent);
 }

@@ -20,14 +20,10 @@ function Footer() {
             Catálogo
           </a>
 
-          <a href="/categories">
-            Categorías
+          <a href="/about">
+            Acerca de
           </a>
-
-          <a href="/series">
-            Series
-          </a>
-
+          
           <a href="/my-catalog">
             Mi Catálogo
           </a>
@@ -45,10 +41,15 @@ function Footer() {
           <h3>Partners</h3>
 
           <p>
-            ITERNAUTA nace con el apoyo de
-            {' '}
-            <strong>Spooky House</strong>,
-            su partner socio inicial.
+            ITERNAUTA nace con el apoyo de{' '}
+            <a
+              href="https://spookyhouse.com.co"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <strong>Spooky House</strong>
+            </a>
+            , partner inicial de este proyecto.
           </p>
 
           <p>
@@ -65,7 +66,14 @@ function Footer() {
 
       <div className="footer-bottom">
         <p>
-          Desarrollado por <strong>MR Freelance</strong>
+          Desarrollado por{' '}
+          <a
+            href="https://wa.me/573026838855"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <strong>MR Freelance</strong>
+          </a>
           {' · '}
           2026 para <strong>ITERNAUTA Project</strong>
         </p>
