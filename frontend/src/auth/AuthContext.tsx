@@ -11,6 +11,7 @@ import type {
 } from '@supabase/supabase-js'
 
 import { supabase } from '../lib/supabase'
+import { apiPost } from '../lib/api'
 
 interface AuthContextValue {
   user: User | null
@@ -35,6 +36,21 @@ export function AuthProvider({
   const [loading, setLoading] =
     useState(true)
 
+  async function sincronizarUsuario() {
+    try {
+      await apiPost('/users')
+
+      console.log(
+        'AUTH CONTEXT - USUARIO SINCRONIZADO',
+      )
+    } catch (error) {
+      console.error(
+        'AUTH CONTEXT - ERROR AL SINCRONIZAR USUARIO:',
+        error,
+      )
+    }
+  }
+
   useEffect(() => {
     async function loadSession() {
       const {
@@ -53,6 +69,11 @@ export function AuthProvider({
       )
 
       setSession(data.session)
+
+      if (data.session) {
+        await sincronizarUsuario()
+      }
+
       setLoading(false)
     }
 
@@ -76,6 +97,10 @@ export function AuthProvider({
           )
 
           setSession(newSession)
+
+          if (newSession) {
+            void sincronizarUsuario()
+          }
         },
       )
 
