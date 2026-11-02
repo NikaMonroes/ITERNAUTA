@@ -2,7 +2,6 @@ import { supabase } from './supabase'
 
 //const API_URL = 'http://localhost:3000'
 const API_URL = import.meta.env.VITE_API_URL
-console.log('API_URL:', API_URL)
 
 async function getAuthHeaders(): Promise<HeadersInit> {
   const {
@@ -10,20 +9,12 @@ async function getAuthHeaders(): Promise<HeadersInit> {
   } = await supabase.auth.getSession()
 
 
-  console.log(
-    'API - SUPABASE URL:',
-    import.meta.env.VITE_SUPABASE_URL,
-  )
 
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
   }
 
   if (session?.access_token) {
-    console.log(
-      'API - TOKEN PRESENTE:',
-      session.access_token.substring(0, 20),
-    )
 
     headers.Authorization = `Bearer ${session.access_token}`
   }
@@ -31,23 +22,7 @@ async function getAuthHeaders(): Promise<HeadersInit> {
   return headers
 }
 
-/*
-async function getAuthHeaders(): Promise<HeadersInit> {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
 
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-  }
-
-  if (session?.access_token) {
-    headers.Authorization = `Bearer ${session.access_token}`
-  }
-
-  return headers
-}
-*/
 export async function apiGet<T>(
   endpoint: string,
 ): Promise<T> {
