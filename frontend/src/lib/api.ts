@@ -9,7 +9,7 @@ async function getAuthHeaders(): Promise<HeadersInit> {
     data: { session },
   } = await supabase.auth.getSession()
 
-  console.log('API - SESSION:', session)
+
   console.log(
     'API - SUPABASE URL:',
     import.meta.env.VITE_SUPABASE_URL,
