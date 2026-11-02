@@ -14,25 +14,26 @@ export class JumpsellerClient {
   private readonly authToken: string;
 
   constructor() {
-    const loginKey =
-      process.env.JUMPSELLER_LOGIN_KEY;
+    this.loginKey =
+      process.env.JUMPSELLER_LOGIN_KEY ?? '';
 
-    const authToken =
-      process.env.JUMPSELLER_AUTH_TOKEN;
+    this.authToken =
+      process.env.JUMPSELLER_AUTH_TOKEN ?? '';
+  }
 
-    if (!loginKey || !authToken) {
+  private ensureCredentials(): void {
+    if (!this.loginKey || !this.authToken) {
       throw new Error(
         'Faltan JUMPSELLER_LOGIN_KEY o JUMPSELLER_AUTH_TOKEN en las variables de entorno.',
       );
     }
-
-    this.loginKey = loginKey;
-    this.authToken = authToken;
   }
 
   async getProductsPage(
     page: number,
   ): Promise<JumpsellerProduct[]> {
+    this.ensureCredentials();
+
     const params = new URLSearchParams({
       login: this.loginKey,
       authtoken: this.authToken,
@@ -66,6 +67,8 @@ export class JumpsellerClient {
   async getProducts(
     limit: number,
   ): Promise<JumpsellerProduct[]> {
+    this.ensureCredentials();
+
     if (limit <= 0) {
       return [];
     }
@@ -110,6 +113,8 @@ export class JumpsellerClient {
   async getAllProducts(): Promise<
     JumpsellerProduct[]
   > {
+    this.ensureCredentials();
+
     const allProducts: JumpsellerProduct[] = [];
 
     const maxPages = 100;
@@ -135,6 +140,8 @@ export class JumpsellerClient {
   async searchProductBySKU(
     sku: string,
   ): Promise<JumpsellerProduct | null> {
+    this.ensureCredentials();
+
     const params = new URLSearchParams({
       login: this.loginKey,
       authtoken: this.authToken,
