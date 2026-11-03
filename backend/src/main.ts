@@ -20,12 +20,6 @@ async function bootstrap() {
   })
 })
 
-  /*
-  app.enableCors({
-    origin: 'http://localhost:5173',
-  })
-  */
-
   app.enableCors({
   origin: process.env.FRONTEND_URL ?? 'http://localhost:5173',
 })
@@ -62,4 +56,8 @@ async function bootstrap() {
   )
 }
 
-await bootstrap()
+//await bootstrap()
+bootstrap().catch((error) => {
+  console.error('ITERNAUTA bootstrap failed:', error)
+  process.exit(1)
+})
