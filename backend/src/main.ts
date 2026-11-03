@@ -12,6 +12,14 @@ import { AppModule } from './app.module.js'
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
 
+
+  //prueba para Vercel
+  app.getHttpAdapter().get('/health', (_req, res) => {
+  res.status(200).json({
+    status: 'ok',
+  })
+})
+
   /*
   app.enableCors({
     origin: 'http://localhost:5173',
