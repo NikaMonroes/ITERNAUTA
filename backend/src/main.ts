@@ -9,6 +9,8 @@ import {
 
 import { AppModule } from './app.module.js'
 
+
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
 
@@ -19,31 +21,8 @@ async function bootstrap() {
     status: 'ok',
   })
 })
-app.get('/auth-test', async (_req, res) => {
-  try {
-    const response = await fetch(
-      `${process.env.SUPABASE_URL}/auth/v1/settings`,
-      {
-        headers: {
-          apikey: process.env.SUPABASE_PUBLISHABLE_KEY ?? '',
-        },
-      },
-    )
 
-    const data = await response.json()
 
-    res.status(response.status).json({
-      status: response.status,
-      data,
-    })
-  } catch (error) {
-    console.error(error)
-
-    res.status(500).json({
-      status: 'error',
-    })
-  }
-})
 //=============================
 
   app.enableCors({
