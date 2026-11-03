@@ -33,11 +33,6 @@ function Login() {
       'Usuario autenticado:',
       data.user,
     )
-    // Borrar cuando se termine la prueba
-    console.log(
-  'ACCESS TOKEN:',
-  data.session?.access_token,
-)
 
     setMensaje(
       'Inicio de sesión exitoso.',
