@@ -2,6 +2,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react'
 
@@ -36,73 +37,61 @@ export function AuthProvider({
   const [loading, setLoading] =
     useState(true)
 
-  async function sincronizarUsuario() {
-    try {
-      await apiPost('/users')
-
-      console.log(
-        'AUTH CONTEXT - USUARIO SINCRONIZADO',
-      )
-    } catch (error) {
-      console.error(
-        'AUTH CONTEXT - ERROR AL SINCRONIZAR USUARIO:',
-        error,
-      )
-    }
-  }
+  const usuarioSincronizado = useRef<string | null>(
+    null,
+  )
 
   useEffect(() => {
-    async function loadSession() {
-      const {
-        data,
-        error,
-      } = await supabase.auth.getSession()
-
-      console.log(
-        'AUTH CONTEXT - SESSION:',
-        data.session,
-      )
-
-      console.log(
-        'AUTH CONTEXT - ERROR:',
-        error,
-      )
-
-      setSession(data.session)
-
-      if (data.session) {
-        await sincronizarUsuario()
-      }
-
-      setLoading(false)
-    }
-
-    loadSession()
-
     const {
-      data: {
-        subscription,
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(
+      (event, newSession) => {
+        setSession(newSession)
+
+        if (!newSession) {
+          usuarioSincronizado.current = null
+          setLoading(false)
+          return
+        }
+
+        const userId = newSession.user.id
+
+        if (
+          usuarioSincronizado.current === userId
+        ) {
+          setLoading(false)
+          return
+        }
+
+        if (
+          event === 'INITIAL_SESSION' ||
+          event === 'SIGNED_IN' ||
+          event === 'TOKEN_REFRESHED'
+        ) {
+          usuarioSincronizado.current = userId
+
+          setTimeout(() => {
+            void apiPost('/users')
+              .then(() => {
+                console.log(
+                  'AUTH CONTEXT - USUARIO SINCRONIZADO',
+                )
+              })
+              .catch((error) => {
+                usuarioSincronizado.current = null
+
+                console.error(
+                  'AUTH CONTEXT - ERROR AL SINCRONIZAR USUARIO:',
+                  error,
+                )
+              })
+              .finally(() => {
+                setLoading(false)
+              })
+          }, 0)
+        }
       },
-    } =
-      supabase.auth.onAuthStateChange(
-        (event, newSession) => {
-          console.log(
-            'AUTH CONTEXT - EVENT:',
-            event,
-          )
-
-          console.log(
-            'AUTH CONTEXT - NEW SESSION:',
-            newSession,
-          )
-
-          setSession(newSession)
-
-          if (newSession) {
-            void sincronizarUsuario()
-          }
-        },
-      )
+    )
 
     return () => {
       subscription.unsubscribe()
