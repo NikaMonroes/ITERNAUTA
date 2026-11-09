@@ -22,13 +22,14 @@ async function bootstrap() {
   })
 })
 
-
-//=============================
-
-  app.enableCors({
-  origin: process.env.FRONTEND_URL ?? 'http://localhost:5173',
+app.enableCors({
+  origin: [
+    'http://localhost:5173',
+    'https://iternauta-project.vercel.app',
+  ],
 })
 
+//=============================
   const config = new DocumentBuilder()
     .setTitle('ITERNAUTA API')
     .setDescription(
