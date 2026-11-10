@@ -3,6 +3,7 @@ import Register from './auth/Register'
 import ForgotPassword from './auth/ForgotPassword'
 import UpdatePassword from './auth/UpdatePassword'
 import Account from './auth/Account'
+import ProtectedRoute from './auth/ProtectedRoute'
 
 import Catalog from './catalog/Catalog'
 import PublicationDetail from './catalog/PublicationDetail'
@@ -50,10 +51,18 @@ function AppContent() {
     content = <UpdatePassword />
 
   } else if (path === '/account') {
-  content = <Account />
+    content = (
+      <ProtectedRoute>
+        <Account />
+      </ProtectedRoute>
+    )
 
   } else if (path === '/my-catalog') {
-  content = <MyCatalog />
+    content = (
+      <ProtectedRoute>
+        <MyCatalog />
+      </ProtectedRoute>
+    )
 
   } else if (path === '/about') {
     content = <About />
