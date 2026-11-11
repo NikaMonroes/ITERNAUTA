@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+
 import Login from './auth/Login'
 import Register from './auth/Register'
 import ForgotPassword from './auth/ForgotPassword'
@@ -17,17 +19,32 @@ import {
   useAuth,
 } from './auth/AuthContext'
 
-// Imports del catálogo
-
-
-
 function AppContent() {
-  const path = window.location.pathname
+  const [path, setPath] = useState(window.location.pathname)
 
-  const {
-    user,
-    loading,
-  } = useAuth()
+  const { user, loading } = useAuth()
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setPath(window.location.pathname)
+    }
+
+    window.addEventListener('popstate', handlePopState)
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [])
+
+  useEffect(() => {
+    const isPrivateRoute =
+      path === '/account' || path === '/my-catalog'
+
+    if (!loading && !user && isPrivateRoute) {
+      window.history.replaceState(null, '', '/login')
+      setPath('/login')
+    }
+  }, [loading, user, path])
 
   if (loading) {
     return null
@@ -39,58 +56,31 @@ function AppContent() {
 
   if (path === '/login') {
     content = <Login />
-
   } else if (path === '/register') {
     content = <Register />
-
   } else if (path === '/forgot-password') {
     content = <ForgotPassword />
-
   } else if (path === '/update-password') {
     content = <UpdatePassword />
-
   } else if (path === '/account') {
-  content = <Account />
-
+    content = user ? <Account /> : <Login />
   } else if (path === '/my-catalog') {
-  content = <MyCatalog />
-
+    content = user ? <MyCatalog /> : <Login />
   } else if (path === '/about') {
     content = <About />
-
-  } else if (
-    path.startsWith('/catalog/publications/')
-  ) {
-    const publicationId = Number(
-      path.split('/').pop(),
-    )
-
-    content = (
-      <PublicationDetail
-        publicationId={publicationId}
-      />
-    )
-
-  } else if (
-    path === '/' ||
-    path === '/catalog'
-  ) {
+  } else if (path.startsWith('/catalog/publications/')) {
+    const publicationId = Number(path.split('/').pop())
+    content = <PublicationDetail publicationId={publicationId} />
+  } else if (path === '/' || path === '/catalog') {
     content = <Catalog />
-
   } else {
     content = <Catalog />
   }
 
   return (
     <div className="app-shell">
-      <Header
-        isAuthenticated={isAuthenticated}
-      />
-
-      <main className="app-main">
-        {content}
-      </main>
-
+      <Header isAuthenticated={isAuthenticated} />
+      <main className="app-main">{content}</main>
       <Footer />
     </div>
   )
