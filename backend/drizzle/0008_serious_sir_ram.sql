@@ -1,0 +1,2 @@
+ALTER TABLE "collection_items" ADD CONSTRAINT "collection_items_unique" UNIQUE("collection_id","publication_id");--> statement-breakpoint
+ALTER TABLE "collections" ADD CONSTRAINT "collections_user_name_unique" UNIQUE("user_id","name");

@@ -1,8 +1,10 @@
+
 import {
   pgTable,
   serial,
   integer,
   timestamp,
+  unique,
 } from 'drizzle-orm/pg-core'
 
 import { collections } from './collection.schema.js'
@@ -25,4 +27,10 @@ export const collectionItems = pgTable(
       .defaultNow()
       .notNull(),
   },
+  (table) => [
+    unique('collection_items_unique').on(
+      table.collectionId,
+      table.publicationId,
+    ),
+  ],
 )

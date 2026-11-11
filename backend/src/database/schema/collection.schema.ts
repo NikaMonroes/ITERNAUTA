@@ -1,3 +1,4 @@
+
 import {
   pgEnum,
   pgTable,
@@ -5,6 +6,7 @@ import {
   integer,
   varchar,
   timestamp,
+  unique,
 } from 'drizzle-orm/pg-core'
 
 import { users } from './user.schema.js'
@@ -42,4 +44,10 @@ export const collections = pgTable(
       .defaultNow()
       .notNull(),
   },
+  (table) => [
+    unique('collections_user_name_unique').on(
+      table.userId,
+      table.name,
+    ),
+  ],
 )
