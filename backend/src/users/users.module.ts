@@ -1,3 +1,4 @@
+
 import { Module } from '@nestjs/common'
 import { UsersController } from './users.controller.js'
 import { UsersService } from './users.service.js'
@@ -11,6 +12,9 @@ import { RolesGuard } from '../authorization/roles.guard.js'
     UsersService,
     RolesGuard,
   ],
-  exports: [UsersService],
+  exports: [
+    UsersService,
+    RolesGuard,
+  ],
 })
 export class UsersModule {}

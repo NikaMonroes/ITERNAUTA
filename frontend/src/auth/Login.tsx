@@ -6,6 +6,8 @@ function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [mensaje, setMensaje] = useState('')
+  const [mostrarRegistro, setMostrarRegistro] =
+    useState(false)
   const [cargando, setCargando] = useState(false)
 
   async function iniciarSesion(
@@ -14,31 +16,32 @@ function Login() {
     e.preventDefault()
 
     setMensaje('')
+    setMostrarRegistro(false)
     setCargando(true)
 
-    const { data, error } =
-      await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+    try {
+      const { error } =
+        await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        })
 
-    setCargando(false)
+      if (error) {
+        setMensaje(
+          'No pudimos iniciar sesión. Verifica tu correo y contraseña.',
+        )
+        setMostrarRegistro(true)
+        return
+      }
 
-    if (error) {
-      setMensaje(`Error: ${error.message}`)
-      return
+      window.location.href = '/catalog'
+    } catch {
+      setMensaje(
+        'Ocurrió un problema al intentar iniciar sesión.',
+      )
+    } finally {
+      setCargando(false)
     }
-
-    console.log(
-      'Usuario autenticado:',
-      data.user,
-    )
-
-    setMensaje(
-      'Inicio de sesión exitoso.',
-    )
-
-    window.location.href = '/catalog'
   }
 
   return (
@@ -115,20 +118,28 @@ function Login() {
         </form>
 
         {mensaje && (
-          <p className="login-message">
-            {mensaje}
-          </p>
+          <div className="login-message">
+            <p>{mensaje}</p>
+
+            {mostrarRegistro && (
+              <a href="/register">
+                Crear una cuenta
+              </a>
+            )}
+          </div>
         )}
 
-        <div className="login-register">
-          <span>
-            ¿Todavía no tienes cuenta?
-          </span>
+        {!mostrarRegistro && (
+          <div className="login-register">
+            <span>
+              ¿Todavía no tienes cuenta?
+            </span>
 
-          <a href="/register">
-            Crear una cuenta
-          </a>
-        </div>
+            <a href="/register">
+              Crear una cuenta
+            </a>
+          </div>
+        )}
 
       </div>
     </section>
