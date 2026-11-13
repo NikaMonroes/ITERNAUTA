@@ -15,52 +15,51 @@ function UpdatePassword() {
   const [cargando, setCargando] = useState(false)
 
   useEffect(() => {
+    let mounted = true
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (!mounted) return
+
+        setSesion(!!session)
+
+        setMensaje(
+          session
+            ? 'Puedes establecer tu nueva contraseña.'
+            : 'No hay una sesión activa. Solicita un enlace de recuperación.',
+        )
+      },
+    )
+
     async function comprobarSesion() {
-      const {
-        data,
-        error,
-      } = await supabase.auth.getSession()
+      const { data, error } =
+        await supabase.auth.getSession()
+
+      if (!mounted) return
 
       if (error) {
+        setSesion(false)
         setMensaje(
-          'No pudimos comprobar la sesión de recuperación.',
+          'No pudimos comprobar tu sesión.',
         )
         return
       }
 
-      if (data.session) {
-        setSesion(true)
-        setMensaje(
-          'Sesión de recuperación detectada.',
-        )
-      } else {
-        setMensaje(
-          'No hay una sesión de recuperación activa.',
-        )
-      }
+      setSesion(!!data.session)
+
+      setMensaje(
+        data.session
+          ? 'Puedes establecer tu nueva contraseña.'
+          : 'No hay una sesión activa. Solicita un enlace de recuperación.',
+      )
     }
 
     comprobarSesion()
 
-    const {
-      data: {
-        subscription,
-      },
-    } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (
-          event === 'PASSWORD_RECOVERY' &&
-          session
-        ) {
-          setSesion(true)
-          setMensaje(
-            'Sesión de recuperación detectada.',
-          )
-        }
-      },
-    )
-
     return () => {
+      mounted = false
       subscription.unsubscribe()
     }
   }, [])
@@ -69,38 +68,48 @@ function UpdatePassword() {
     e: React.FormEvent,
   ) {
     e.preventDefault()
-
     setMensaje('')
 
     if (password !== confirmPassword) {
-      setMensaje(
-        'Las contraseñas no coinciden.',
-      )
+      setMensaje('Las contraseñas no coinciden.')
       return
     }
 
     setCargando(true)
 
-    const { error } =
-      await supabase.auth.updateUser({
+    try {
+      const { data } = await supabase.auth.getSession()
+
+      if (!data.session) {
+        setSesion(false)
+        setMensaje(
+          'Tu sesión ha expirado. Solicita un nuevo enlace.',
+        )
+        return
+      }
+
+      const { error } = await supabase.auth.updateUser({
         password,
       })
 
-    setCargando(false)
+      if (error) {
+        setMensaje(`Error: ${error.message}`)
+        return
+      }
 
-    if (error) {
+      setPassword('')
+      setConfirmPassword('')
+
       setMensaje(
-        `Error: ${error.message}`,
+        '¡Contraseña actualizada correctamente!',
       )
-      return
+    } catch {
+      setMensaje(
+        'No pudimos actualizar tu contraseña. Inténtalo nuevamente.',
+      )
+    } finally {
+      setCargando(false)
     }
-
-    setMensaje(
-      'Contraseña actualizada correctamente.',
-    )
-
-    setPassword('')
-    setConfirmPassword('')
   }
 
   return (
@@ -112,13 +121,11 @@ function UpdatePassword() {
             ITERNAUTA
           </span>
 
-          <h1>
-            Nueva contraseña
-          </h1>
+          <h1>Nueva contraseña</h1>
 
           <p>
-            Crea una nueva contraseña para
-            recuperar el acceso a tu cuenta.
+            Crea una nueva contraseña para tu
+            cuenta de ITERNAUTA.
           </p>
         </div>
 
@@ -151,6 +158,7 @@ function UpdatePassword() {
                   setPassword(e.target.value)
                 }
                 required
+                autoComplete="new-password"
               />
             </div>
 
@@ -165,11 +173,10 @@ function UpdatePassword() {
                 placeholder="••••••••"
                 value={confirmPassword}
                 onChange={(e) =>
-                  setConfirmPassword(
-                    e.target.value,
-                  )
+                  setConfirmPassword(e.target.value)
                 }
                 required
+                autoComplete="new-password"
               />
             </div>
 
@@ -185,13 +192,23 @@ function UpdatePassword() {
           </form>
         )}
 
+        
         {!sesion && (
           <div className="update-password-footer">
             <a href="/forgot-password">
               Solicitar un nuevo enlace
             </a>
+
+            <p>
+              ¿Todavía no tienes cuenta?
+            </p>
+
+            <a href="/register">
+              Crear una cuenta
+            </a>
           </div>
         )}
+
 
         {sesion && (
           <div className="update-password-footer">

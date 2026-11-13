@@ -1,3 +1,4 @@
+
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 import './ForgotPassword.css'
@@ -15,41 +16,41 @@ function ForgotPassword() {
     setMensaje('')
     setCargando(true)
 
-    const { error } =
-      await supabase.auth.resetPasswordForEmail(
-        email,
-        {
-          redirectTo:
-            'http://localhost:5173/update-password',
-        },
-      )
+    try {
+      const { error } =
+        await supabase.auth.resetPasswordForEmail(
+          email.trim(),
+          {
+            redirectTo: `${window.location.origin}/update-password`,
+          },
+        )
 
-    setCargando(false)
+      if (error) {
+        setMensaje(`Error: ${error.message}`)
+        return
+      }
 
-    if (error) {
       setMensaje(
-        `Error: ${error.message}`,
+        'Revisa tu correo. Te hemos enviado un enlace para restablecer tu contraseña.',
       )
-      return
+    } catch {
+      setMensaje(
+        'No pudimos enviar el enlace. Inténtalo nuevamente.',
+      )
+    } finally {
+      setCargando(false)
     }
-
-    setMensaje(
-      'Revisa tu correo. Te hemos enviado un enlace para restablecer tu contraseña.',
-    )
   }
 
   return (
     <main className="forgot-page">
       <section className="forgot-card">
-
         <div className="forgot-header">
           <span className="forgot-kicker">
             ITERNAUTA
           </span>
 
-          <h1>
-            Recuperar contraseña
-          </h1>
+          <h1>Recuperar contraseña</h1>
 
           <p>
             Introduce tu correo electrónico y te
@@ -107,7 +108,6 @@ function ForgotPassword() {
             Volver a iniciar sesión
           </a>
         </div>
-
       </section>
     </main>
   )
