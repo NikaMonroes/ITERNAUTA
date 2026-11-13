@@ -191,24 +191,22 @@ function UpdatePassword() {
             </button>
           </form>
         )}
-
-        
+   
         {!sesion && (
           <div className="update-password-footer">
-            <a href="/forgot-password">
+            <a
+              href="/forgot-password"
+              className="update-password-recovery-link"
+            >
               Solicitar un nuevo enlace
             </a>
 
-            <p>
-              ¿Todavía no tienes cuenta?
-            </p>
-
-            <a href="/register">
-              Crear una cuenta
-            </a>
+            <div className="update-password-register">
+              <span>¿Todavía no tienes cuenta?</span>
+              <a href="/register">Crear una cuenta</a>
+            </div>
           </div>
         )}
-
 
         {sesion && (
           <div className="update-password-footer">
