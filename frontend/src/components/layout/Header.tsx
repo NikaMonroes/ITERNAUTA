@@ -45,7 +45,7 @@ function Header({
 
           {isAuthenticated ? (
             <a
-              href="/account"
+              href="/dashboard"
               className="account-link"
             >
               👤 Mi cuenta

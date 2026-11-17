@@ -4,12 +4,14 @@ import Login from './auth/Login'
 import Register from './auth/Register'
 import ForgotPassword from './auth/ForgotPassword'
 import UpdatePassword from './auth/UpdatePassword'
-import Account from './auth/Account'
+
 
 import Catalog from './catalog/Catalog'
 import PublicationDetail from './catalog/PublicationDetail'
 import MyCatalog from './my-catalog/MyCatalog'
 import About from './about/About'
+
+import Dashboard from './dashboard/Dashboard'
 
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
@@ -38,7 +40,9 @@ function AppContent() {
 
   useEffect(() => {
     const isPrivateRoute =
-      path === '/account' || path === '/my-catalog'
+      path === '/dashboard' ||
+      path === '/my-catalog' 
+      
 
     if (!loading && !user && isPrivateRoute) {
       window.history.replaceState(null, '', '/login')
@@ -62,8 +66,10 @@ function AppContent() {
     content = <ForgotPassword />
   } else if (path === '/update-password') {
     content = <UpdatePassword />
-  } else if (path === '/account') {
-    content = user ? <Account /> : <Login />
+  } else if (path === '/dashboard') {
+    content = user ? <Dashboard /> : <Login />
+  } else if (path === '/dashboard') {
+    content = user ? <Dashboard /> : <Login />
   } else if (path === '/my-catalog') {
     content = user ? <MyCatalog /> : <Login />
   } else if (path === '/about') {

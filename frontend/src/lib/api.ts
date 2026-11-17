@@ -99,3 +99,35 @@ export async function apiPost<T>(
 
   return response.json()
 }
+
+
+export async function apiPatch<T>(
+  endpoint: string,
+  body: unknown,
+): Promise<T> {
+  const headers = await getAuthHeaders()
+
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    method: 'PATCH',
+    headers,
+    body: JSON.stringify(body),
+  })
+
+  if (!response.ok) {
+    let message = `Error ${response.status}: ${response.statusText}`
+
+    try {
+      const data = await response.json()
+
+      if (data?.message) {
+        message = data.message
+      }
+    } catch {
+      // Conservamos el mensaje HTTP.
+    }
+
+    throw new Error(message)
+  }
+
+  return response.json()
+}

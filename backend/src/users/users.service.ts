@@ -45,6 +45,27 @@ export class UsersService {
     return result[0] ?? null
   }
 
+  async updateAlias(
+  identityProviderId: string,
+  alias: string | null,
+) {
+  const result = await this.db
+    .update(users)
+    .set({
+      alias,
+      updatedAt: new Date(),
+    })
+    .where(
+      eq(
+        users.identityProviderId,
+        identityProviderId,
+      ),
+    )
+    .returning()
+
+  return result[0] ?? null
+}
+
   async create(
     identityProviderId: string,
     email: string,

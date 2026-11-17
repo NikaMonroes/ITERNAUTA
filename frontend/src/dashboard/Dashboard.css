@@ -1,0 +1,46 @@
+.dashboard-page {
+  width: 100%;
+  padding: 4rem 1.5rem 5rem;
+}
+
+.dashboard-container {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  margin-bottom: 2rem;
+}
+
+.dashboard-kicker {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.dashboard-header h1 {
+  margin: 0 0 0.75rem;
+  color: var(--text-h);
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1.1;
+}
+
+.dashboard-header p {
+  max-width: 650px;
+  margin: 0;
+  line-height: 1.7;
+}
+
+.dashboard-promotions {
+  margin-top: 0;
+}
+
+@media (max-width: 768px) {
+  .dashboard-page {
+    padding: 2.5rem 1rem 4rem;
+  }
+}
