@@ -68,8 +68,6 @@ function AppContent() {
     content = <UpdatePassword />
   } else if (path === '/dashboard') {
     content = user ? <Dashboard /> : <Login />
-  } else if (path === '/dashboard') {
-    content = user ? <Dashboard /> : <Login />
   } else if (path === '/my-catalog') {
     content = user ? <MyCatalog /> : <Login />
   } else if (path === '/about') {
