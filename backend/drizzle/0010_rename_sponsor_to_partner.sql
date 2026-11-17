@@ -1,0 +1,2 @@
+ALTER TYPE "public"."user_role"
+RENAME VALUE 'SPONSOR' TO 'PARTNER';
