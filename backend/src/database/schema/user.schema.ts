@@ -1,5 +1,4 @@
 import {
-  integer,
   pgEnum,
   pgTable,
   serial,
@@ -29,6 +28,10 @@ export const users = pgTable('users', {
   email: varchar('email', {
     length: 255,
   }).notNull().unique(),
+
+  alias: varchar('alias', {
+    length: 20,
+  }),
 
   role: userRoleEnum('role')
     .notNull()

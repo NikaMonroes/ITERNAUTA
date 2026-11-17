@@ -1,18 +1,20 @@
 import {
   Controller,
   Get,
-  Param,
   Post,
   Req,
   UseGuards,
   UnauthorizedException,
   NotFoundException,
+  Body,
+  BadRequestException,
+  Patch,
 } from '@nestjs/common'
 
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiOperation,
-  ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
@@ -75,29 +77,108 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: 'Buscar usuario por proveedor de identidad',
-    description:
-      'Busca un usuario local mediante su identificador de Supabase.',
-  })
-  @ApiParam({
-    name: 'identityProviderId',
-    type: String,
-    description:
-      'Identificador del usuario en el proveedor de identidad.',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Usuario encontrado o null si no existe.',
-  })
-  @Get('identity/:identityProviderId')
-  findByIdentityProviderId(
-    @Param('identityProviderId')
-    identityProviderId: string,
-  ) {
-    return this.usersService.findByIdentityProviderId(
-      identityProviderId,
+  summary: 'Actualizar alias del usuario autenticado',
+  description:
+    'Permite establecer, modificar o eliminar el alias del usuario autenticado.',
+})
+@ApiResponse({
+  status: 200,
+  description: 'Alias actualizado correctamente.',
+})
+@ApiResponse({
+  status: 400,
+  description: 'El alias no es válido o supera los 20 caracteres.',
+})
+@ApiResponse({
+  status: 401,
+  description: 'Token de autenticación requerido o inválido.',
+})
+@ApiResponse({
+  status: 404,
+  description: 'Usuario no registrado en ITERNAUTA.',
+})
+
+@ApiBody({
+  schema: {
+    type: 'object',
+    properties: {
+      alias: {
+        type: 'string',
+        nullable: true,
+        maxLength: 20,
+        example: 'Moni',
+      },
+    },
+    required: ['alias'],
+  },
+})
+
+
+@Patch('me')
+@UseGuards(SupabaseAuthGuard)
+async updateMe(
+  @Req() request: Request,
+  @Body() body: { alias?: unknown },
+) {
+  const user = request.user
+
+  if (!user) {
+    throw new UnauthorizedException(
+      'Usuario autenticado no encontrado',
     )
   }
+
+if (
+  !body ||
+  typeof body !== 'object' ||
+  Array.isArray(body)
+) {
+  throw new BadRequestException(
+    'El cuerpo de la solicitud no es válido.',
+  )
+}
+
+
+  if (
+    body.alias === undefined ||
+    (
+      body.alias !== null &&
+      typeof body.alias !== 'string'
+    )
+  ) {
+    throw new BadRequestException(
+      'Debes proporcionar un alias válido.',
+    )
+  }
+
+  const alias =
+    typeof body.alias === 'string'
+      ? body.alias.trim()
+      : null
+
+  if (
+    alias !== null &&
+    Array.from(alias).length > 20
+  ) {
+    throw new BadRequestException(
+      'El alias no puede superar los 20 caracteres.',
+    )
+  }
+
+  const updatedUser =
+    await this.usersService.updateAlias(
+      user.id,
+      alias || null,
+    )
+
+  if (!updatedUser) {
+    throw new NotFoundException(
+      'Usuario no registrado en ITERNAUTA',
+    )
+  }
+
+  return updatedUser
+}
 
   @ApiOperation({
     summary: 'Crear usuario local',
